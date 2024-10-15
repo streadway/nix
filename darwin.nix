@@ -5,7 +5,6 @@
 {
   # $ nix-env -qaP | grep wget
   environment.systemPackages = [
-    pkgs.neovim
     pkgs.mkalias
   ];
 
@@ -20,8 +19,6 @@
   programs.zsh.enable = true;
   programs.fish.enable = true;
 
-  # Set Git commit hash for darwin-version.
-  # system.configurationRevision = self.rev or self.dirtyRev or null;
   system.stateVersion = 5;
 
   nixpkgs = {

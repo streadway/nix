@@ -11,10 +11,13 @@
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
 
-  outputs = inputs@{ self, nix-darwin, home-manager, nix-homebrew, nixpkgs }: {
+  outputs = inputs@{ self, nix-darwin, home-manager, nix-homebrew, nixpkgs }:
+    let
+      system.configurationRevision = self.rev or self.dirtyRev or null;
+    in {
     darwinConfigurations."veo" = nix-darwin.lib.darwinSystem {
       modules = [
-        ./darwin.nix
+	./darwin.nix
         home-manager.darwinModules.home-manager {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;

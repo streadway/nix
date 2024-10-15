@@ -6,6 +6,7 @@ let
     bq
   ]);
 in {
+
   home.username = "sean";
   home.homeDirectory = "/Users/sean";
 
@@ -84,14 +85,17 @@ in {
     "/Users/sean/bin"
     "/Users/sean/go/bin"
     "/Users/sean/.cargo/bin"
-    "/opt/homebrew/bin"
-    "/opt/homebrew/sbin"
-    "/Users/sean/.modular/pkg/packages.modular.com_mojo/bin"
   ];
 
   programs.home-manager.enable = true;
 
   programs.direnv.enable = true;
+
+  programs.neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+  };
 
   programs.fish = {
     enable = true;
@@ -101,7 +105,6 @@ in {
     ];
 
     shellAliases = {
-      # aws="op plugin run -- aws";
       assume="source ${granted}/share/assume.fish";
     };
 
@@ -111,32 +114,18 @@ in {
         source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
     end
 
-    set -gx HOMEBREW_PREFIX "/opt/homebrew";
-    set -gx HOMEBREW_CELLAR "/opt/homebrew/Cellar";
-    set -gx HOMEBREW_REPOSITORY "/opt/homebrew";
-    fish_add_path -gP "/opt/homebrew/bin" "/opt/homebrew/sbin";
-    ! set -q MANPATH; and set MANPATH ""; set -gx MANPATH "/opt/homebrew/share/man" $MANPATH;
-    ! set -q INFOPATH; and set INFOPATH ""; set -gx INFOPATH "/opt/homebrew/share/info" $INFOPATH;
+    #set -gx HOMEBREW_PREFIX "/opt/homebrew";
+    #set -gx HOMEBREW_CELLAR "/opt/homebrew/Cellar";
+    #set -gx HOMEBREW_REPOSITORY "/opt/homebrew";
+    #fish_add_path -gP "/opt/homebrew/bin" "/opt/homebrew/sbin";
+    #! set -q MANPATH; and set MANPATH ""; set -gx MANPATH "/opt/homebrew/share/man" $MANPATH;
+    #! set -q INFOPATH; and set INFOPATH ""; set -gx INFOPATH "/opt/homebrew/share/info" $INFOPATH;
     '';
 
     functions = {
       config = {
         body = "git --git-dir=$HOME/.config.git/ --work-tree=$HOME $argv";
       };
-      "source.env" = ''
-        set -f envfile "$argv"
-        if not test -f "$envfile"
-          echo "Unable to load $envfile"
-          return 1
-        end
-        while read line
-          if not string match -qr '^#|^$' "$line"
-            set item (string split -m 1 '=' $line)
-            set -gx $item[1] $item[2]
-            echo "Exported key $item[1]"
-          end
-        end < "$envfile"
-      '';
     };
   };
 
