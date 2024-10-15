@@ -7,6 +7,7 @@ in
 {
   imports = [
     ../modules/nvim.nix
+    ./pr-122-fix-fish.nix
   ];
 
   nix = {
@@ -37,6 +38,7 @@ in
 
   # $ nix-env -qaP | grep wget
   environment = {
+    systemPath = [ /run/current-system/sw/bin ];
     systemPackages = [
       pkgs.mkalias
     ];
