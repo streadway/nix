@@ -2,11 +2,12 @@
 let
   granted = pkgs.granted.override { withFish = true; };
 
-  gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents( with pkgs.google-cloud-sdk.components; [
+  gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
     bq
   ]);
-in {
+in
+{
 
   home.username = "sean";
   home.homeDirectory = "/Users/sean";
@@ -73,7 +74,7 @@ in {
   };
 
   home.sessionVariables = {
-    EDITOR="nvim";
+    EDITOR = "nvim";
   };
 
   home.sessionPath = [
@@ -87,34 +88,6 @@ in {
 
   programs.direnv.enable = true;
 
-  programs.nixvim = {
-    enable = true;
-    enableMan = false;
-    viAlias = true;
-    vimAlias = true;
-    vimdiffAlias = true;
-
-    globals = {
-      mapleader = ",";
-      maplocalleader = ",";
-    };
-
-    opts = {
-      number = true;
-
-      shiftwidth = 2;
-      tabstop = 2;
-      expandtab = true;
-
-      autoindent = true;
-      smartindent = true;
-      smarttab = true;
-
-      cursorline = true;
-    };
-
-  };
-
   programs.fish = {
     enable = true;
 
@@ -123,7 +96,7 @@ in {
     ];
 
     shellAliases = {
-      assume="source ${granted}/share/assume.fish";
+      assume = "source ${granted}/share/assume.fish";
     };
 
     functions = {
@@ -149,6 +122,33 @@ in {
     enable = true;
     package = pkgs.vscode;
   };
+
+  #programs.nixvim = {
+  #  enable = true;
+  #  enableMan = false;
+  #  viAlias = true;
+  #  vimAlias = true;
+  #  vimdiffAlias = true;
+
+  #  globals = {
+  #    mapleader = ",";
+  #    maplocalleader = ",";
+  #  };
+
+  #  opts = {
+  #    number = true;
+
+  #    shiftwidth = 2;
+  #    tabstop = 2;
+  #    expandtab = true;
+
+  #    autoindent = true;
+  #    smartindent = true;
+  #    smarttab = true;
+
+  #    cursorline = true;
+  #  };
+  #};
 
   #programs.vim = {
   #  enable = true;

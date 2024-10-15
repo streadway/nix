@@ -1,10 +1,17 @@
 # vim: ts=2 sw=2 et
 
-{ pkgs, config, nixvim, ... }:
+{ pkgs, config, nixvim, vars, ... }:
 
+let
+in
 {
+  imports = [
+    ../modules/nvim.nix
+  ];
+
   nix = {
     package = pkgs.nix;
+
     settings = {
       experimental-features = "nix-command flakes";
     };
@@ -23,30 +30,31 @@
     };
   };
 
+  users.users.${vars.user} = {
+    home = "/Users/${vars.user}";
+    shell = pkgs.fish;
+  };
 
   # $ nix-env -qaP | grep wget
   environment = {
     systemPackages = [
-    pkgs.mkalias
+      pkgs.mkalias
     ];
     variables = {
-      EDITOR= "nvim";
+      EDITOR = "nvim";
       VISUAL = "nvim";
     };
   };
 
   fonts.packages = [
     (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-  ]; 
+  ];
+
+  programs.fish.enable = true;
+
+  home-manager.users.${vars.user} = import ../home.nix;
 
   services.nix-daemon.enable = true;
 
   system.stateVersion = 5;
-
-  programs.fish.enable = true;
-
-  users.users.${vars.user} = {
-    home = "/Users/${vars.user}";
-    shell = pkgs.fish;
-  };
 }
