@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 let
   granted = pkgs.granted.override { withFish = true; };
+
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents( with pkgs.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
     bq
@@ -63,11 +64,6 @@ in {
   ];
 
   home.file = {
-    # ".screenrc".source = dotfiles/screenrc;
-    # ".gradle/gradle.properties".text = ''
-    #   org.gradle.console=verbose
-    #   org.gradle.daemon.idletimeout=3600000
-    # '';
     ".ssh/config".text = ''
       Host github.com
         AddKeysToAgent yes
@@ -77,7 +73,7 @@ in {
   };
 
   home.sessionVariables = {
-    EDITOR="vim";
+    EDITOR="nvim";
   };
 
   home.sessionPath = [
@@ -91,10 +87,32 @@ in {
 
   programs.direnv.enable = true;
 
-  programs.neovim = {
+  programs.nixvim = {
     enable = true;
+    enableMan = false;
     viAlias = true;
     vimAlias = true;
+    vimdiffAlias = true;
+
+    globals = {
+      mapleader = ",";
+      maplocalleader = ",";
+    };
+
+    opts = {
+      number = true;
+
+      shiftwidth = 2;
+      tabstop = 2;
+      expandtab = true;
+
+      autoindent = true;
+      smartindent = true;
+      smarttab = true;
+
+      cursorline = true;
+    };
+
   };
 
   programs.fish = {
@@ -107,20 +125,6 @@ in {
     shellAliases = {
       assume="source ${granted}/share/assume.fish";
     };
-
-    shellInit = 
-    ''
-    if test -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
-        source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
-    end
-
-    #set -gx HOMEBREW_PREFIX "/opt/homebrew";
-    #set -gx HOMEBREW_CELLAR "/opt/homebrew/Cellar";
-    #set -gx HOMEBREW_REPOSITORY "/opt/homebrew";
-    #fish_add_path -gP "/opt/homebrew/bin" "/opt/homebrew/sbin";
-    #! set -q MANPATH; and set MANPATH ""; set -gx MANPATH "/opt/homebrew/share/man" $MANPATH;
-    #! set -q INFOPATH; and set INFOPATH ""; set -gx INFOPATH "/opt/homebrew/share/info" $INFOPATH;
-    '';
 
     functions = {
       config = {
@@ -146,35 +150,35 @@ in {
     package = pkgs.vscode;
   };
 
-  programs.vim = {
-    enable = true;
+  #programs.vim = {
+  #  enable = true;
 
-    plugins = with pkgs.vimPlugins; [
-      gruvbox-community
-      typescript-vim
-      vim-airline
-      vim-nix
-    ];
+  #  plugins = with pkgs.vimPlugins; [
+  #    gruvbox-community
+  #    typescript-vim
+  #    vim-airline
+  #    vim-nix
+  #  ];
 
-    settings = {
-      tabstop = 2;
-      shiftwidth = 2;
-      expandtab = true;
-    };
+  #  settings = {
+  #    tabstop = 2;
+  #    shiftwidth = 2;
+  #    expandtab = true;
+  #  };
 
-    extraConfig = ''
-      let mapleader = ","
-      let maplocalleader = ","
+  #  extraConfig = ''
+  #    let mapleader = ","
+  #    let maplocalleader = ","
 
-      set list
-      set smartindent
-      set smarttab
+  #    set list
+  #    set smartindent
+  #    set smarttab
 
-      set background=dark
-      colorscheme gruvbox
-      syntax on
-    '';
-  };
+  #    set background=dark
+  #    colorscheme gruvbox
+  #    syntax on
+  #  '';
+  #};
 
   programs.java = {
     enable = true;
