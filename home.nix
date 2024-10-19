@@ -1,7 +1,6 @@
 { config, pkgs, ... }:
 let
-  granted = pkgs.granted.override { withFish = true; };
-
+  granted = pkgs.granted.override { fish = pkgs.fish; withFish = true; };
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
     bq
@@ -18,7 +17,6 @@ in
     #gst_all_1.gst-plugins-bad
     #gst_all_1.gst-plugins-ugly
     _1password
-    alacritty
     awscli2
     cacert
     cargo
@@ -64,14 +62,16 @@ in
     #libffi
   ];
 
-  home.file = {
-    ".ssh/config".text = ''
+  home.file.".ssh/config" = {
+    text = ''
       Host github.com
         AddKeysToAgent yes
         UseKeychain yes
         IdentityFile ~/.ssh/id_ed25519
     '';
   };
+
+  #home.file."${pkgs.fish}/share/fish/vendor_conf.d/assume.fish".source = "${granted}/share/assume.fish";
 
   home.sessionVariables = {
     EDITOR = "nvim";
@@ -86,24 +86,12 @@ in
 
   programs.home-manager.enable = true;
 
-  programs.direnv.enable = true;
-
-  programs.fish = {
+  programs.dircolors.enable = true;
+  programs.fzf.enable = true;
+  programs.zoxide = {
     enable = true;
-
-    plugins = with pkgs.fishPlugins; [
-      { name = "tide"; src = tide.src; }
-    ];
-
-    shellAliases = {
-      assume = "source ${granted}/share/assume.fish";
-    };
-
-    functions = {
-      config = {
-        body = "git --git-dir=$HOME/.config.git/ --work-tree=$HOME $argv";
-      };
-    };
+    enableFishIntegration = true;
+    options = [ "--cmd cd" ];
   };
 
   programs.git = {
