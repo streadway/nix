@@ -12,13 +12,35 @@
     ../modules/nvim.nix
   ];
 
-  nix.settings.experimental-features = "nix-command flakes";
-  nixpkgs.config.allowUnfree = true;
+  nix = {
+    package = pkgs.nix;
+    settings.experimental-features = "nix-command flakes";
+    gc = {
+      automatic = true;
+      interval.Day = 7;
+      options = "--delete-older-than 7d";
+    };
+  };
 
-  environment.systemPackages = [
-    pkgs.vim
-    pkgs.git
-  ];
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+      allowUnfreePredicate = (_: true);
+    };
+  };
+
+  environment = {
+    systemPackages = [
+      pkgs.vim
+      pkgs.git
+      pkgs.fishPlugins.tide
+    ];
+
+    variables = {
+      EDITOR = "vim";
+      VISUAL = "vim";
+    };
+  };
 
   users.users.${vars.user} = {
     home = "/home/${vars.user}";
@@ -26,6 +48,7 @@
   };
 
   programs.fish.enable = true;
+  programs.direnv.enable = true;
 
   home-manager.users.${vars.user} = import ../home.nix;
 

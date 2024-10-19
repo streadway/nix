@@ -62,19 +62,12 @@ in
     #libffi
 ];
 
-  home.file.".ssh/config" = {
-    text = ''
-      Host github.com
-        AddKeysToAgent yes
-        #UseKeychain yes
-        IdentityFile ~/.ssh/id_ed25519
-    '';
-  };
-
   #home.file."${pkgs.fish}/share/fish/vendor_conf.d/assume.fish".source = "${granted}/share/assume.fish";
 
   home.sessionVariables = {
-    EDITOR = "nvim";
+    EDITOR = "vim";
+    VISUAL = "vim";
+    BROWSER = "firefox";
   };
 
   home.sessionPath = [

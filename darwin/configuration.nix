@@ -37,6 +37,14 @@ in
   };
 
   home-manager.users.${vars.user} = import ../home.nix;
+  home-manager.users.${vars.user}.home.file.".ssh/config" = {
+    text = ''
+      Host github.com
+        AddKeysToAgent yes
+        UseKeychain yes
+        IdentityFile ~/.ssh/id_ed25519
+    '';
+  };
 
   # $ nix-env -qaP | grep wget
   environment = {
