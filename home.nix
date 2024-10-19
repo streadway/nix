@@ -8,8 +8,8 @@ let
 in
 {
 
-  home.username = "sean";
-  home.homeDirectory = "/Users/sean";
+  #home.username = "sean";
+  #home.homeDirectory = "/home/sean";
 
   home.stateVersion = "24.05";
 
@@ -60,13 +60,13 @@ in
     #openssl
     #zlib
     #libffi
-  ];
+];
 
   home.file.".ssh/config" = {
     text = ''
       Host github.com
         AddKeysToAgent yes
-        UseKeychain yes
+        #UseKeychain yes
         IdentityFile ~/.ssh/id_ed25519
     '';
   };
@@ -84,7 +84,7 @@ in
     "/Users/sean/.cargo/bin"
   ];
 
-  programs.home-manager.enable = true;
+  #programs.home-manager.enable = true;
 
   programs.dircolors.enable = true;
   programs.fzf.enable = true;
@@ -106,10 +106,10 @@ in
     };
   };
 
-  programs.vscode = {
-    enable = true;
-    package = pkgs.vscode;
-  };
+#  programs.vscode = {
+#    enable = true;
+#    package = pkgs.vscode;
+#  };
 
   #programs.nixvim = {
   #  enable = true;

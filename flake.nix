@@ -29,9 +29,12 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs-stable, darwin, home-manager, nix-homebrew, nixvim }:
+  outputs = inputs@{ self, nixpkgs, nixpkgs-stable, darwin, home-manager, nix-homebrew, nixvim, nixos-wsl }:
     let
       system.configurationRevision = self.rev or self.dirtyRev or null;
       vars = {
@@ -43,6 +46,13 @@
         import ./darwin {
           inherit (nixpkgs) lib;
           inherit inputs nixpkgs nixpkgs-stable home-manager darwin nixvim vars;
+        }
+      );
+
+      nixosConfigurations = (
+        import ./nixos {
+          inherit (nixpkgs) lib;
+          inherit inputs nixpkgs nixpkgs-stable home-manager nixos-wsl nixvim vars;
         }
       );
     };
