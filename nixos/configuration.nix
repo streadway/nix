@@ -14,10 +14,11 @@
 
   nix = {
     package = pkgs.nix;
-    settings.experimental-features = "nix-command flakes";
+    settings = {
+      experimental-features = "nix-command flakes";
+    };
     gc = {
       automatic = true;
-      interval.Day = 7;
       options = "--delete-older-than 7d";
     };
   };
@@ -31,6 +32,7 @@
 
   environment = {
     systemPackages = [
+      pkgs.tzdata
       pkgs.vim
       pkgs.git
       pkgs.fishPlugins.tide
@@ -49,6 +51,15 @@
 
   programs.fish.enable = true;
   programs.direnv.enable = true;
+
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql_15;
+    authentication = pkgs.lib.mkOverride 10 ''
+      #type database  DBuser  auth-method
+      local all       all     trust
+    '';
+  };
 
   home-manager.users.${vars.user} = import ../home.nix;
 
