@@ -50,6 +50,7 @@
           system = "aarch64-darwin";
           extraModules = [
             ./veo.nix
+            ./modules/nvim.nix
           ];
         };
       };

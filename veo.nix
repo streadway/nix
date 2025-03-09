@@ -170,9 +170,4 @@
   system.stateVersion = 5;
 
   security.pam.services.sudo_local.touchIdAuth = true;
-  
-  # Import the nvim module instead of inline configuration
-  imports = [
-    ./modules/nvim.nix
-  ];
 } 
