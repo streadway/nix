@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  granted = pkgs.granted.override { fish = pkgs.fish; withFish = true; };
+  #granted = pkgs.granted.override { fish = pkgs.fish; withFish = true; };
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
     cloud-run-proxy
@@ -37,7 +37,6 @@ in
     gh
     git
     git-repo
-    granted
     graphviz
     #gst_all_1.gst-plugins-base
     #gst_all_1.gst-plugins-good
@@ -87,10 +86,6 @@ in
     '';
   };
 
-  home.file.".config/fish/conf.d/assume.fish" = {
-    text = ''alias assume="source ${granted}/share/assume.fish"'';
-  };
-
   home.sessionVariables = {
     EDITOR = "nvim";
   };
@@ -123,6 +118,10 @@ in
     '';
   };
 
+  programs.granted = {
+    enable = true;
+  };
+
   programs.dircolors.enable = true;
   programs.fzf.enable = true;
   programs.zoxide = {
@@ -142,68 +141,6 @@ in
       credential."https://github.com".useHttpPath = true;
     };
   };
-
-  programs.vscode = {
-    enable = true;
-    package = pkgs.vscode;
-  };
-
-  #programs.nixvim = {
-  #  enable = true;
-  #  enableMan = false;
-  #  viAlias = true;
-  #  vimAlias = true;
-  #  vimdiffAlias = true;
-
-  #  globals = {
-  #    mapleader = ",";
-  #    maplocalleader = ",";
-  #  };
-
-  #  opts = {
-  #    number = true;
-
-  #    shiftwidth = 2;
-  #    tabstop = 2;
-  #    expandtab = true;
-
-  #    autoindent = true;
-  #    smartindent = true;
-  #    smarttab = true;
-
-  #    cursorline = true;
-  #  };
-  #};
-
-  #programs.vim = {
-  #  enable = true;
-
-  #  plugins = with pkgs.vimPlugins; [
-  #    gruvbox-community
-  #    typescript-vim
-  #    vim-airline
-  #    vim-nix
-  #  ];
-
-  #  settings = {
-  #    tabstop = 2;
-  #    shiftwidth = 2;
-  #    expandtab = true;
-  #  };
-
-  #  extraConfig = ''
-  #    let mapleader = ","
-  #    let maplocalleader = ","
-
-  #    set list
-  #    set smartindent
-  #    set smarttab
-
-  #    set background=dark
-  #    colorscheme gruvbox
-  #    syntax on
-  #  '';
-  #};
 
   programs.java = {
     enable = true;

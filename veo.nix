@@ -52,7 +52,6 @@
 
   # Enable fish at the system level, but configuration is in home-manager
   programs.fish.enable = true;
-  programs.zsh.enable = true;
 
   programs.direnv = {
     enable = true;
@@ -76,8 +75,6 @@
       "ghostty"
     ];
   };
-
-  services.nix-daemon.enable = true;
 
   services.redis = {
     enable = true;
@@ -172,7 +169,7 @@
 
   system.stateVersion = 5;
 
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.services.sudo_local.touchIdAuth = true;
   
   # Import the nvim module at the user level instead of system level
   programs.nixvim = {
