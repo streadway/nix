@@ -33,7 +33,7 @@
   environment = {
     systemPackages = [
       pkgs.mkalias
-      pkgs.fishPlugins.tide
+      # Fish plugins are now managed by home-manager
 
       pkgs.darwin.apple_sdk.frameworks.CoreFoundation
       pkgs.darwin.apple_sdk.frameworks.CoreServices
@@ -50,7 +50,7 @@
     pkgs.nerd-fonts.jetbrains-mono
   ];
 
-  programs.fish.enable = true;
+  # Fish is now managed by home-manager
   programs.zsh.enable = true;
 
   programs.direnv = {

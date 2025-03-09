@@ -104,6 +104,25 @@ in
 
   programs.home-manager.enable = true;
 
+  # Fish shell configuration
+  programs.fish = {
+    enable = true;
+    plugins = [
+      {
+        name = "tide";
+        src = pkgs.fishPlugins.tide.src;
+      }
+    ];
+    shellAliases = {
+      ll = "ls -la";
+      g = "git";
+    };
+    shellInit = ''
+      # Custom fish shell initialization
+      set -g fish_greeting ""  # Disable greeting
+    '';
+  };
+
   programs.dircolors.enable = true;
   programs.fzf.enable = true;
   programs.zoxide = {
