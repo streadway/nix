@@ -85,7 +85,6 @@ in
     '';
   };
 
-  # Use the passed homeDirectory for paths
   home.sessionPath = [
     "node_modules/.bin"
     "${homeDirectory}/bin"
@@ -93,7 +92,7 @@ in
     "${homeDirectory}/.cargo/bin"
   ];
 
-  programs.home-manager.enable = true;
+  #programs.home-manager.enable = true;
 
   # Fish shell configuration
   programs.fish = {

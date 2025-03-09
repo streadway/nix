@@ -23,15 +23,21 @@
 
     nix-homebrew = {
       url = "github:zhaofengli-wip/nix-homebrew";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs-stable, darwin, home-manager, nix-homebrew, nixvim }:
+  outputs = inputs@{ self, nixpkgs, nixpkgs-stable, darwin, home-manager, nix-homebrew, nixvim, nixos-wsl }:
     let
       system.configurationRevision = self.rev or self.dirtyRev or null;
       vars = {
@@ -44,7 +50,6 @@
       };
     in
     {
-      # Darwin configurations
       darwinConfigurations = {
         veo = darwinLib.mkDarwinSystem {
           system = "aarch64-darwin";
@@ -54,16 +59,12 @@
           ];
         };
       };
-      
-      # NixOS configurations can be added here
-      nixosConfigurations = {
-        # Example:
-        # myNixosSystem = nixpkgs.lib.nixosSystem {
-        #   system = "x86_64-linux";
-        #   modules = [
-        #     ./nixos-configuration.nix
-        #   ];
-        # };
-      };
+
+      nixosConfigurations = (
+        import ./nixos {
+          inherit (nixpkgs) lib;
+          inherit inputs nixpkgs nixpkgs-stable home-manager nixos-wsl nixvim vars;
+        }
+      );
     };
 }
