@@ -27,7 +27,6 @@
     shell = pkgs.fish;
   };
 
-  # Use the standard Home Manager approach
   home-manager.users.${vars.user} = { ... }: {
     imports = [ ./home.nix ];
     

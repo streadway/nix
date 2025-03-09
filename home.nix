@@ -1,4 +1,4 @@
-{ config, pkgs, username ? "sean", homeDirectory ? "/Users/sean", ... }:
+{ config, pkgs, username, homeDirectory, ... }:
 let
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
@@ -83,10 +83,6 @@ in
         AddKeysToAgent yes
         IdentityFile ~/.ssh/id_ed25519
     '';
-  };
-
-  home.sessionVariables = {
-    EDITOR = "nvim";
   };
 
   # Use the passed homeDirectory for paths
