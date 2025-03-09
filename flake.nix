@@ -37,13 +37,30 @@
       vars = {
         user = "sean";
       };
+      
+      # Import the Darwin system builder
+      darwinLib = import ./lib/darwin.nix {
+        inherit inputs nixpkgs nixpkgs-stable darwin home-manager nixvim vars;
+      };
     in
     {
-      darwinConfigurations = (
-        import ./darwin {
-          inherit (nixpkgs) lib;
-          inherit inputs nixpkgs nixpkgs-stable home-manager darwin nixvim vars;
-        }
-      );
+      # Darwin configurations
+      darwinConfigurations = {
+        veo = darwinLib.mkDarwinSystem {
+          system = "aarch64-darwin";
+          extraModules = [];
+        };
+      };
+      
+      # NixOS configurations can be added here
+      nixosConfigurations = {
+        # Example:
+        # myNixosSystem = nixpkgs.lib.nixosSystem {
+        #   system = "x86_64-linux";
+        #   modules = [
+        #     ./nixos-configuration.nix
+        #   ];
+        # };
+      };
     };
 }
