@@ -1,4 +1,4 @@
-{ config, pkgs, vars ? { user = "sean"; }, ... }:
+{ config, pkgs, username ? "sean", homeDirectory ? "/Users/sean", ... }:
 let
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
@@ -9,9 +9,9 @@ let
   ]);
 in
 {
-  # Use vars for username and home directory
-  home.username = vars.user;
-  home.homeDirectory = "/Users/${vars.user}";
+  # Use the passed username and homeDirectory
+  home.username = username;
+  home.homeDirectory = homeDirectory;
 
   home.stateVersion = "24.05";
 
@@ -89,12 +89,12 @@ in
     EDITOR = "nvim";
   };
 
-  # Use vars for paths
+  # Use the passed homeDirectory for paths
   home.sessionPath = [
     "node_modules/.bin"
-    "/Users/${vars.user}/bin"
-    "/Users/${vars.user}/go/bin"
-    "/Users/${vars.user}/.cargo/bin"
+    "${homeDirectory}/bin"
+    "${homeDirectory}/go/bin"
+    "${homeDirectory}/.cargo/bin"
   ];
 
   programs.home-manager.enable = true;

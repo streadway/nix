@@ -27,7 +27,14 @@
     shell = pkgs.fish;
   };
 
-  home-manager.users.${vars.user} = import ./home.nix { inherit vars; };
+  # Use the standard Home Manager approach
+  home-manager.users.${vars.user} = { ... }: {
+    imports = [ ./home.nix ];
+    
+    # Pass variables to home.nix through home-manager options
+    _module.args.username = vars.user;
+    _module.args.homeDirectory = "/Users/${vars.user}";
+  };
 
   environment = {
     systemPackages = [
