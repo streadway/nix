@@ -50,7 +50,8 @@
     pkgs.nerd-fonts.jetbrains-mono
   ];
 
-  # Fish is now managed by home-manager
+  # Enable fish at the system level, but configuration is in home-manager
+  programs.fish.enable = true;
   programs.zsh.enable = true;
 
   programs.direnv = {
