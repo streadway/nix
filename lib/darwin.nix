@@ -28,7 +28,6 @@ in
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
         }
-        ../darwin-configuration.nix
       ] ++ extraModules;
     };
 } 

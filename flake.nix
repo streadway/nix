@@ -48,7 +48,9 @@
       darwinConfigurations = {
         veo = darwinLib.mkDarwinSystem {
           system = "aarch64-darwin";
-          extraModules = [];
+          extraModules = [
+            ./veo.nix
+          ];
         };
       };
       

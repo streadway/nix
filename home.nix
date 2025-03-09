@@ -3,6 +3,9 @@ let
   granted = pkgs.granted.override { fish = pkgs.fish; withFish = true; };
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
+    cloud-run-proxy
+    cloud-sql-proxy
+    log-streaming
     bq
   ]);
 in
@@ -16,17 +19,24 @@ in
   home.packages = with pkgs; [
     #gst_all_1.gst-plugins-bad
     #gst_all_1.gst-plugins-ugly
-    _1password
-    awscli2
+    _1password-cli
+    act
+    awscli
+    aws-sam-cli
+    ssm-session-manager-plugin
+    bat
     cacert
     cargo
     clippy
     cloc
-    ffmpeg-full
+    cue
+    duckdb
+    #ffmpeg-full
     fio
     gcloud-sdk
     gh
     git
+    git-repo
     granted
     graphviz
     #gst_all_1.gst-plugins-base
@@ -34,10 +44,12 @@ in
     #gst_all_1.gstreamer
     heroku
     htop
+    jujutsu
     jq
     kubectl
-    lzma
+    kustomize
     nixpkgs-fmt
+    nixfmt-classic
     nmap
     nodejs_20
     openapi-generator-cli
@@ -47,12 +59,16 @@ in
     pv
     pyenv
     python312
+    uv
     ripgrep
     rustc
     shellcheck
+    sqlfluff
+    terraform
     tree
     watch
     wget
+    xz
     yq
 
     # python extensions
@@ -64,14 +80,16 @@ in
 
   home.file.".ssh/config" = {
     text = ''
-      Host github.com
+      Host *
+        ForwardAgent yes
         AddKeysToAgent yes
-        UseKeychain yes
         IdentityFile ~/.ssh/id_ed25519
     '';
   };
 
-  #home.file."${pkgs.fish}/share/fish/vendor_conf.d/assume.fish".source = "${granted}/share/assume.fish";
+  home.file.".config/fish/conf.d/assume.fish" = {
+    text = ''alias assume="source ${granted}/share/assume.fish"'';
+  };
 
   home.sessionVariables = {
     EDITOR = "nvim";
@@ -170,7 +188,7 @@ in
 
   programs.java = {
     enable = true;
-    package = pkgs.openjdk22;
+    package = pkgs.jdk23;
   };
 
   programs.go = {

@@ -7,14 +7,15 @@
     viAlias = true;
     vimAlias = true;
 
+    keymaps = [
+    ];
+
     globals = {
       mapleader = ",";
       maplocalleader = ",";
     };
 
-    extraPlugins = [
-      pkgs.vimPlugins.gruvbox
-    ];
+    extraPlugins = [ pkgs.vimPlugins.gruvbox ];
 
     plugins = {
       lightline.enable = true;
@@ -22,6 +23,38 @@
       direnv.enable = true;
       auto-save.enable = true;
       orgmode.enable = true;
+      web-devicons.enable = true;
+      treesitter.enable = true;
+      noice.enable = true;
+      which-key.enable = true;
+      gitsigns = {
+        enable = true;
+        settings.current_line_blame = true;
+      };
+
+      telescope = {
+        enable = true;
+        keymaps = {
+          "<C-p>" = {
+            action = "git_files";
+            options = {
+              desc = "Telescope Git Files";
+            };
+          };
+          "<leader>ff" = "find_files";
+          "<leader>fg" = "live_grep";
+          "<leader>fb" = "find_buffers";
+          "<leader>fd" = "file_browser";
+        };
+        extensions.file-browser.enable = true;
+      };
+
+      cmp = {
+        enable = true;
+        autoEnableSources = true;
+      };
+      cmp-nvim-lsp.enable = true;
+      cmp-treesitter.enable = true;
 
       lsp = {
         enable = true;
@@ -45,7 +78,8 @@
       smartindent = true;
       smarttab = true;
 
-      cursorline = true;
+      #cursorline = true;
+      cmdheight = 0;
     };
   };
 }
