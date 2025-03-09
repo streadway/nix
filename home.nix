@@ -1,6 +1,5 @@
-{ config, pkgs, ... }:
+{ config, pkgs, vars, ... }:
 let
-  #granted = pkgs.granted.override { fish = pkgs.fish; withFish = true; };
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
     cloud-run-proxy
@@ -10,9 +9,9 @@ let
   ]);
 in
 {
-
-  home.username = "sean";
-  home.homeDirectory = "/Users/sean";
+  # Use vars for username and home directory
+  home.username = vars.user;
+  home.homeDirectory = "/Users/${vars.user}";
 
   home.stateVersion = "24.05";
 
@@ -90,11 +89,12 @@ in
     EDITOR = "nvim";
   };
 
+  # Use vars for paths
   home.sessionPath = [
     "node_modules/.bin"
-    "/Users/sean/bin"
-    "/Users/sean/go/bin"
-    "/Users/sean/.cargo/bin"
+    "/Users/${vars.user}/bin"
+    "/Users/${vars.user}/go/bin"
+    "/Users/${vars.user}/.cargo/bin"
   ];
 
   programs.home-manager.enable = true;

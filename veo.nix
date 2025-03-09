@@ -27,13 +27,11 @@
     shell = pkgs.fish;
   };
 
-  home-manager.users.${vars.user} = import ./home.nix;
+  home-manager.users.${vars.user} = import ./home.nix { inherit vars; };
 
-  # $ nix-env -qaP | grep wget
   environment = {
     systemPackages = [
       pkgs.mkalias
-      # Fish plugins are now managed by home-manager
 
       pkgs.darwin.apple_sdk.frameworks.CoreFoundation
       pkgs.darwin.apple_sdk.frameworks.CoreServices
@@ -55,7 +53,6 @@
 
   programs.direnv = {
     enable = true;
-    #loadInNixShell = true;
   };
 
   homebrew = {
