@@ -1,6 +1,9 @@
-{ config, pkgs, username, homeDirectory, ... }:
+{ config, pkgs, username ? "sean", homeDirectory ? "/Users/sean", unstablePkgs ? pkgs, ... }:
 let
-  gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
+  # Use unstablePkgs for packages from nixpkgs-unstable
+  unstable = unstablePkgs;
+  
+  gcloud-sdk = unstable.google-cloud-sdk.withExtraComponents (with unstable.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
     cloud-run-proxy
     cloud-sql-proxy
@@ -15,7 +18,8 @@ in
 
   home.stateVersion = "24.05";
 
-  home.packages = with pkgs; [
+  # Use unstable packages for most packages
+  home.packages = with unstable; [
     #gst_all_1.gst-plugins-bad
     #gst_all_1.gst-plugins-ugly
     _1password-cli
@@ -100,7 +104,7 @@ in
     plugins = [
       {
         name = "tide";
-        src = pkgs.fishPlugins.tide.src;
+        src = unstable.fishPlugins.tide.src;
       }
     ];
     shellAliases = {
@@ -139,7 +143,7 @@ in
 
   programs.java = {
     enable = true;
-    package = pkgs.jdk23;
+    package = unstable.jdk23;
   };
 
   programs.go = {

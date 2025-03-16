@@ -33,6 +33,9 @@
     # Pass variables to home.nix through home-manager options
     _module.args.username = vars.user;
     _module.args.homeDirectory = "/Users/${vars.user}";
+    
+    # Explicitly set pkgs to use nixpkgs-unstable
+    _module.args.unstablePkgs = pkgs;
   };
 
   environment = {
