@@ -22,25 +22,31 @@ in
   home.packages = with unstable; [
     #gst_all_1.gst-plugins-bad
     #gst_all_1.gst-plugins-ugly
-    _1password-cli
+    _1password-cli 
     act
     awscli
     aws-sam-cli
     ssm-session-manager-plugin
+    basedpyright
     bat
     cacert
     cargo
+    claude-code
     clippy
     cloc
     cue
     duckdb
-    #ffmpeg-full
+    difftastic
+    ffmpeg-full
     fio
     gcloud-sdk
+    gg-jj # jj ui
     gh
     git
     git-repo
     graphviz
+    grafana-loki
+    #granted
     #gst_all_1.gst-plugins-base
     #gst_all_1.gst-plugins-good
     #gst_all_1.gstreamer
@@ -48,26 +54,29 @@ in
     htop
     jujutsu
     jq
+    k9s
     kubectl
     kustomize
     nixpkgs-fmt
     nixfmt-classic
     nmap
     nodejs_20
+    gnumake
+    mise
     openapi-generator-cli
     plantuml
-    postgresql_15
+    postgresql_17
     pre-commit
     pv
     pyenv
     python312
-    uv
     ripgrep
     rustc
     shellcheck
     sqlfluff
     terraform
     tree
+    uv
     watch
     wget
     xz
@@ -117,9 +126,10 @@ in
     '';
   };
 
-  programs.granted = {
-    enable = true;
-  };
+#  programs.granted = {
+#    enable = true;
+#    enableFishIntegration = true;
+#  };
 
   programs.dircolors.enable = true;
   programs.fzf.enable = true;

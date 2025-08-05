@@ -22,6 +22,11 @@
     };
   };
 
+  system = {
+    primaryUser = "${vars.user}";
+    primaryUserHome = "/Users/${vars.user}";
+  };
+
   users.users.${vars.user} = {
     home = "/Users/${vars.user}";
     shell = pkgs.fish;
@@ -42,9 +47,9 @@
     systemPackages = [
       pkgs.mkalias
 
-      pkgs.darwin.apple_sdk.frameworks.CoreFoundation
-      pkgs.darwin.apple_sdk.frameworks.CoreServices
-      pkgs.darwin.apple_sdk.frameworks.Security
+#      pkgs.darwin.apple_sdk.frameworks.CoreFoundation
+#      pkgs.darwin.apple_sdk.frameworks.CoreServices
+#      pkgs.darwin.apple_sdk.frameworks.Security
     ];
 
     variables = {
@@ -73,6 +78,7 @@
 
     casks = [
       "firefox"
+      "chromedriver"
       "brave-browser"
       "google-chrome"
       "rectangle"
@@ -109,6 +115,12 @@
         name = "zola";
         ensurePermissions = {
           "DATABASE zola" = "ALL PRIVILEGES";
+        };
+      }
+      {
+        name = "flappy";
+        ensurePermissions = {
+          "DATABASE flappy" = "ALL PRIVILEGES";
         };
       }
     ];
@@ -148,28 +160,35 @@
         show-recents = false;
         tilesize = 40;
       };
+      controlcenter = {
+        BatteryShowPercentage = true;
+      };
 
       CustomUserPreferences = {
-        # Settings of plist in ~/Library/Preferences/
-        "com.apple.finder" = {
-          # Set home directory as startup window
-          NewWindowTargetPath = "file:///Users/${vars.user}/";
-          NewWindowTarget = "PfHm";
-          # Set search scope to directory
-          FXDefaultSearchScope = "SCcf";
-          # Multi-file tab view
-          FinderSpawnTab = true;
-        };
-        "com.apple.desktopservices" = {
-          # Disable creating .DS_Store files in network an USB volumes
-          DSDontWriteNetworkStores = true;
-          DSDontWriteUSBStores = true;
-        };
-        # Show battery percentage
-        "~/Library/Preferences/ByHost/com.apple.controlcenter".BatteryShowPercentage = true;
-        # Privacy
         "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
       };
+
+      #CustomUserPreferences = {
+      #  # Settings of plist in ~/Library/Preferences/
+      #  "com.apple.finder" = {
+      #    # Set home directory as startup window
+      #    NewWindowTargetPath = "file:///Users/${vars.user}/";
+      #    NewWindowTarget = "PfHm";
+      #    # Set search scope to directory
+      #    FXDefaultSearchScope = "SCcf";
+      #    # Multi-file tab view
+      #    FinderSpawnTab = true;
+      #  };
+      #  "com.apple.desktopservices" = {
+      #    # Disable creating .DS_Store files in network an USB volumes
+      #    DSDontWriteNetworkStores = true;
+      #    DSDontWriteUSBStores = true;
+      #  };
+      #  # Show battery percentage
+      #  "~/Library/Preferences/ByHost/com.apple.controlcenter".BatteryShowPercentage = true;
+      #  # Privacy
+      #  "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
+      #};
     };
   };
 

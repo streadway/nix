@@ -8,7 +8,7 @@
     };
 
     nixpkgs-stable = {
-      url = "github:NixOS/nixpkgs/nixos-24.05";
+      url = "github:NixOS/nixpkgs/nixos-25.05";
     };
 
     darwin = {
@@ -22,8 +22,7 @@
     };
 
     nix-homebrew = {
-      url = "github:zhaofengli-wip/nix-homebrew";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:zhaofengli/nix-homebrew";
     };
 
     nixvim = {
