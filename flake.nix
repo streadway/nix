@@ -1,6 +1,6 @@
 # vim: set sw=2 ts=2 et
 {
-  description = "MacGyvertosh";
+  description = "Sean's NixOS configurations";
 
   inputs = {
     nixpkgs = {
@@ -42,7 +42,7 @@
       vars = {
         user = "sean";
       };
-      
+
       # Import the Darwin system builder
       darwinLib = import ./lib/darwin.nix {
         inherit inputs nixpkgs nixpkgs-stable darwin home-manager nixvim vars;
@@ -53,6 +53,7 @@
         veo = darwinLib.mkDarwinSystem {
           system = "aarch64-darwin";
           extraModules = [
+            { nixpkgs.config.allowUnfree = true; }
             ./veo.nix
             ./modules/nvim.nix
           ];

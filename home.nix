@@ -46,7 +46,6 @@ in
     git-repo
     graphviz
     grafana-loki
-    #granted
     #gst_all_1.gst-plugins-base
     #gst_all_1.gst-plugins-good
     #gst_all_1.gstreamer
@@ -66,10 +65,9 @@ in
     openapi-generator-cli
     plantuml
     postgresql_17
-    pre-commit
     pv
     pyenv
-    python312
+    python313
     ripgrep
     rustc
     shellcheck
@@ -100,6 +98,8 @@ in
 
   home.sessionPath = [
     "node_modules/.bin"
+    "${homeDirectory}/.local/npm-packages/bin"
+    "${homeDirectory}/.local/bin"
     "${homeDirectory}/bin"
     "${homeDirectory}/go/bin"
     "${homeDirectory}/.cargo/bin"
@@ -126,10 +126,10 @@ in
     '';
   };
 
-#  programs.granted = {
-#    enable = true;
-#    enableFishIntegration = true;
-#  };
+  programs.granted = {
+    enable = true;
+    enableFishIntegration = true;
+  };
 
   programs.dircolors.enable = true;
   programs.fzf.enable = true;
