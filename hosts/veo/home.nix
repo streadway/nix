@@ -1,9 +1,6 @@
-{ config, pkgs, username ? "sean", homeDirectory ? "/Users/sean", unstablePkgs ? pkgs, ... }:
+{ config, pkgs, ... }:
 let
-  # Use unstablePkgs for packages from nixpkgs-unstable
-  unstable = unstablePkgs;
-  
-  gcloud-sdk = unstable.google-cloud-sdk.withExtraComponents (with unstable.google-cloud-sdk.components; [
+  gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
     gke-gcloud-auth-plugin
     cloud-run-proxy
     cloud-sql-proxy
@@ -12,17 +9,14 @@ let
   ]);
 in
 {
-  # Use the passed username and homeDirectory
-  home.username = username;
-  home.homeDirectory = homeDirectory;
-
+  home.username = "sean";
+  home.homeDirectory = "/Users/sean";
   home.stateVersion = "24.05";
 
-  # Use unstable packages for most packages
-  home.packages = with unstable; [
+  home.packages = with pkgs; [
     #gst_all_1.gst-plugins-bad
     #gst_all_1.gst-plugins-ugly
-    _1password-cli 
+    _1password-cli
     act
     awscli
     aws-sam-cli
@@ -98,11 +92,11 @@ in
 
   home.sessionPath = [
     "node_modules/.bin"
-    "${homeDirectory}/.local/npm-packages/bin"
-    "${homeDirectory}/.local/bin"
-    "${homeDirectory}/bin"
-    "${homeDirectory}/go/bin"
-    "${homeDirectory}/.cargo/bin"
+    "~/.local/npm-packages/bin"
+    "~/.local/bin"
+    "~/bin"
+    "~/go/bin"
+    "~/.cargo/bin"
   ];
 
   #programs.home-manager.enable = true;
@@ -113,7 +107,7 @@ in
     plugins = [
       {
         name = "tide";
-        src = unstable.fishPlugins.tide.src;
+        src = pkgs.fishPlugins.tide.src;
       }
     ];
     shellAliases = {
@@ -153,7 +147,7 @@ in
 
   programs.java = {
     enable = true;
-    package = unstable.jdk23;
+    package = pkgs.jdk23;
   };
 
   programs.go = {

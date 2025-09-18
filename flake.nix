@@ -11,7 +11,7 @@
       url = "github:NixOS/nixpkgs/nixos-25.05";
     };
 
-    darwin = {
+    nix-darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -36,27 +36,31 @@
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs-stable, darwin, home-manager, nix-homebrew, nixvim, nixos-wsl }:
+  outputs = inputs@{ self, nixpkgs, nixpkgs-stable, nix-darwin, home-manager, nix-homebrew, nixvim, nixos-wsl }:
     let
       system.configurationRevision = self.rev or self.dirtyRev or null;
       vars = {
         user = "sean";
       };
-
-      # Import the Darwin system builder
-      darwinLib = import ./lib/darwin.nix {
-        inherit inputs nixpkgs nixpkgs-stable darwin home-manager nixvim vars;
-      };
     in
     {
       darwinConfigurations = {
-        veo = darwinLib.mkDarwinSystem {
+        veo = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
-          extraModules = [
-            { nixpkgs.config.allowUnfree = true; }
-            ./veo.nix
-            ./modules/nvim.nix
+          modules = [
+            nixvim.nixDarwinModules.nixvim
+            home-manager.darwinModules.home-manager {
+              home-manager.users.sean = import ./hosts/veo/home.nix;
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+            }
+            ./hosts/veo/default.nix
           ];
+          # extraModules = [
+          #   { nixpkgs.config.allowUnfree = true; }
+          #   ./veo.nix
+          #   ./modules/nvim.nix
+          # ];
         };
       };
 

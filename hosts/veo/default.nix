@@ -1,57 +1,26 @@
-{ pkgs, config, vars, inputs, system, stable, ... }:
+{ pkgs, config, system, ... }:
 
 {
-  nix = {
-    package = pkgs.nix;
-
-    settings = {
-      experimental-features = "nix-command flakes";
-    };
-    gc = {
-      automatic = true;
-      interval.Day = 7;
-      options = "--delete-older-than 7d";
-    };
-  };
+  imports = [
+    ../../modules/nix.nix
+    ../../modules/nvim.nix
+  ];
 
   nixpkgs = {
     hostPlatform = "aarch64-darwin";
-    config = {
-      allowUnfree = true;
-      allowUnfreePredicate = (_: true);
-    };
   };
 
   system = {
-    primaryUser = "${vars.user}";
-    primaryUserHome = "/Users/${vars.user}";
+    primaryUser = "sean";
+    primaryUserHome = "/Users/sean";
   };
 
-  users.users.${vars.user} = {
-    home = "/Users/${vars.user}";
+  users.users.sean = {
+    home = "/Users/sean";
     shell = pkgs.fish;
   };
 
-  home-manager.users.${vars.user} = { ... }: {
-    imports = [ ./home.nix ];
-    
-    # Pass variables to home.nix through home-manager options
-    _module.args.username = vars.user;
-    _module.args.homeDirectory = "/Users/${vars.user}";
-    
-    # Explicitly set pkgs to use nixpkgs-unstable
-    _module.args.unstablePkgs = pkgs;
-  };
-
   environment = {
-    systemPackages = [
-      pkgs.mkalias
-
-#      pkgs.darwin.apple_sdk.frameworks.CoreFoundation
-#      pkgs.darwin.apple_sdk.frameworks.CoreServices
-#      pkgs.darwin.apple_sdk.frameworks.Security
-    ];
-
     variables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
@@ -62,7 +31,7 @@
     pkgs.nerd-fonts.jetbrains-mono
   ];
 
-  # Enable fish at the system level, but configuration is in home-manager
+  # Enable fish for the system, configure in home-manager
   programs.fish.enable = true;
 
   programs.direnv = {
@@ -104,7 +73,7 @@
       host  all     all   all       scram-sha-256
 
     '';
-    dataDir = "/Users/${vars.user}/.local/postgres/17";
+    dataDir = "/Users/sean/.local/postgres/17";
     initdbArgs = [ "--locale=en_US.UTF-8" "--encoding=UTF-8" ];
     enableTCPIP = true;
     ensureDatabases = [
@@ -195,4 +164,4 @@
   system.stateVersion = 5;
 
   security.pam.services.sudo_local.touchIdAuth = true;
-} 
+}
