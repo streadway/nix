@@ -2,13 +2,9 @@
 
 {
   imports = [
-    ../../modules/nix.nix
-    ../../modules/nvim.nix
+    ../modules/nix.nix
+    ../modules/nvim.nix
   ];
-
-  nixpkgs = {
-    hostPlatform = "aarch64-darwin";
-  };
 
   system = {
     primaryUser = "sean";

@@ -5,12 +5,14 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, lib, pkgs, nixvim, vars, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   imports = [
     ../modules/nvim.nix
   ];
+
+  home-manager.users.sean = import ../homes/sean.nix;
 
   nix = {
     package = pkgs.nix;
@@ -44,8 +46,8 @@
     };
   };
 
-  users.users.${vars.user} = {
-    home = "/home/${vars.user}";
+  users.users.sean = {
+    home = "/home/sean";
     shell = pkgs.fish;
   };
 
@@ -60,8 +62,6 @@
       local all       all     trust
     '';
   };
-
-  home-manager.users.${vars.user} = import ../home.nix;
 
   system.stateVersion = "24.05";
 }

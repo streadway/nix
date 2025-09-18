@@ -1,84 +1,30 @@
-{ config, pkgs, ... }:
-let
-  gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (with pkgs.google-cloud-sdk.components; [
-    gke-gcloud-auth-plugin
-    cloud-run-proxy
-    cloud-sql-proxy
-    log-streaming
-    bq
-  ]);
-in
+{ config, lib, pkgs, ... }:
 {
   home.username = "sean";
-  home.homeDirectory = "/Users/sean";
+  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
   home.stateVersion = "24.05";
 
   home.packages = with pkgs; [
-    #gst_all_1.gst-plugins-bad
-    #gst_all_1.gst-plugins-ugly
     _1password-cli
     act
-    awscli
-    aws-sam-cli
     ssm-session-manager-plugin
-    basedpyright
     bat
     cacert
-    cargo
     claude-code
-    clippy
-    cloc
-    cue
-    duckdb
     difftastic
-    ffmpeg-full
-    fio
-    gcloud-sdk
+    #ffmpeg-full
     gg-jj # jj ui
-    gh
-    git
-    git-repo
-    graphviz
     grafana-loki
-    #gst_all_1.gst-plugins-base
-    #gst_all_1.gst-plugins-good
-    #gst_all_1.gstreamer
-    heroku
     htop
-    jujutsu
-    jq
-    k9s
-    kubectl
-    kustomize
     nixpkgs-fmt
     nixfmt-classic
     nmap
-    nodejs_20
-    gnumake
     mise
     openapi-generator-cli
     plantuml
     postgresql_17
-    pv
-    pyenv
-    python313
-    ripgrep
-    rustc
-    shellcheck
-    sqlfluff
     terraform
-    tree
-    uv
-    watch
     wget
-    xz
-    yq
-
-    # python extensions
-    #clang
-    #openssl
-    #zlib
-    #libffi
   ];
 
   home.file.".ssh/config" = {
@@ -99,8 +45,6 @@ in
     "~/.cargo/bin"
   ];
 
-  #programs.home-manager.enable = true;
-
   # Fish shell configuration
   programs.fish = {
     enable = true;
@@ -110,19 +54,11 @@ in
         src = pkgs.fishPlugins.tide.src;
       }
     ];
-    shellAliases = {
-      ll = "ls -la";
-      g = "git";
-    };
+    shellAliases = {};
     shellInit = ''
       # Custom fish shell initialization
       set -g fish_greeting ""  # Disable greeting
     '';
-  };
-
-  programs.granted = {
-    enable = true;
-    enableFishIntegration = true;
   };
 
   programs.dircolors.enable = true;
@@ -131,6 +67,36 @@ in
     enable = true;
     enableFishIntegration = true;
     options = [ "--cmd cd" ];
+  };
+
+  programs.gh.enable = true;
+
+  programs.jujutsu = {
+    enable = true;
+    settings = {
+     user = {
+       name = "Sean Treadway";
+       email = "srt@veo.co";
+     };
+
+    ui = {
+      merge-editor = "vimdiff";
+    };
+
+    fix.tools.ruffcheck = {
+      command = ["ruff" "check" "--fix" "--stdin-filename=$path" "-"];
+      patterns = ["glob:'**/*.py'"];
+    };
+
+    fix.tools.ruffformat = {
+      command = ["ruff" "format" "--stdin-filename=$path" "-"];
+      patterns = ["glob:'**/*.py'"];
+    };
+
+    aliases = {
+      tug = ["bookmark" "move" "--from" "heads(::@- & bookmarks())" "--to" "@-"];
+    };
+    };
   };
 
   programs.git = {
@@ -143,14 +109,5 @@ in
     extraConfig = {
       credential."https://github.com".useHttpPath = true;
     };
-  };
-
-  programs.java = {
-    enable = true;
-    package = pkgs.jdk23;
-  };
-
-  programs.go = {
-    enable = true;
   };
 }
