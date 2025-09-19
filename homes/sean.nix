@@ -19,7 +19,6 @@
     nixpkgs-fmt
     nixfmt-classic
     nmap
-    mise
     openapi-generator-cli
     plantuml
     postgresql_17
@@ -59,6 +58,11 @@
       # Custom fish shell initialization
       set -g fish_greeting ""  # Disable greeting
     '';
+  };
+
+  programs.mise = {
+    enable = true;
+    enableFishIntegration = true;
   };
 
   programs.dircolors.enable = true;
