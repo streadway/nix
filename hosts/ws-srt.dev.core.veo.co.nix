@@ -12,6 +12,12 @@
     isNormalUser = true;
     extraGroups = [ "wheel" "docker" ];
     shell = pkgs.fish;
+    openssh.authorizedKeys.keys = [
+      {
+        comment = "srt.veo.local";
+        key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEoDCPzWaZ2g6eVgPUfVHWnpz67VO7GsKL9gxFuqLYJL srt@veo.co";
+      }
+    ];
   };
 
   programs.fish.enable = true;
