@@ -36,6 +36,13 @@
     '';
   };
 
+  home.file.".ssh/authorized_keys" = {
+    text = ''
+      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEoDCPzWaZ2g6eVgPUfVHWnpz67VO7GsKL9gxFuqLYJL srt@veo.co
+    '';
+    mode = "0600";
+  };
+
   home.sessionPath = [
     "node_modules/.bin"
     "~/.local/npm-packages/bin"
