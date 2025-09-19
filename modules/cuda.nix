@@ -57,16 +57,13 @@
   environment.systemPackages = with pkgs; [
     cudaPackages.cudatoolkit
     cudaPackages.cudnn
-
     nvtopPackages.nvidia
-    glxinfo
   ];
 
   # Environment variables for CUDA development
   environment.variables = {
     CUDA_PATH = "${pkgs.cudaPackages.cudatoolkit}";
     CUDA_ROOT = "${pkgs.cudaPackages.cudatoolkit}";
-    EXTRA_LDFLAGS = "-L/lib -L${config.boot.kernelPackages.nvidia_x11}/lib";
-    EXTRA_CCFLAGS = "-I/usr/include";
+    EXTRA_LDFLAGS = "-L${config.boot.kernelPackages.nvidia_x11}/lib";
   };
 }
