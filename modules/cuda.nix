@@ -50,8 +50,10 @@
   # Speedup CUDA startup
   hardware.nvidia.nvidiaPersistenced = true;
 
-  # NVIDIA container toolkit for Docker/Podman
-  # hardware.nvidia-container-toolkit.enable = true;
+  # NVIDIA container toolkit for Docker/Podman with CDI as:
+  # [x] docker run --gpus all
+  # [✓] docker run --device nvidia.com/gpus
+  hardware.nvidia-container-toolkit.enable = true;
 
   # CUDA development packages and tools
   environment.systemPackages = with pkgs; [
