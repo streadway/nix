@@ -52,7 +52,7 @@
 
   # NVIDIA container toolkit for Docker/Podman with CDI as:
   # [x] docker run --gpus all
-  # [✓] docker run --device nvidia.com/gpus
+  # [✓] docker run --device nvidia.com/gpus=all
   hardware.nvidia-container-toolkit.enable = true;
 
   # CUDA development packages and tools
