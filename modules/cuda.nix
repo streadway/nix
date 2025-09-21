@@ -51,7 +51,7 @@
   hardware.nvidia.nvidiaPersistenced = true;
 
   # NVIDIA container toolkit for Docker/Podman
-  hardware.nvidia-container-toolkit.enable = true;
+  # hardware.nvidia-container-toolkit.enable = true;
 
   # CUDA development packages and tools
   environment.systemPackages = with pkgs; [
