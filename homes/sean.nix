@@ -1,7 +1,13 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   home.username = "sean";
-  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
+  home.homeDirectory =
+    if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
   home.stateVersion = "24.05";
 
   home.packages = with pkgs; [
@@ -16,8 +22,6 @@
     gg-jj # jj ui
     grafana-loki
     htop
-    nixpkgs-fmt
-    nixfmt-classic
     nmap
     openapi-generator-cli
     plantuml
@@ -53,7 +57,7 @@
         src = pkgs.fishPlugins.tide.src;
       }
     ];
-    shellAliases = {};
+    shellAliases = { };
     shellInit = ''
       # Custom fish shell initialization
       set -g fish_greeting ""  # Disable greeting
@@ -78,28 +82,46 @@
   programs.jujutsu = {
     enable = true;
     settings = {
-     user = {
-       name = "Sean Treadway";
-       email = "srt@veo.co";
-     };
+      user = {
+        name = "Sean Treadway";
+        email = "srt@veo.co";
+      };
 
-    ui = {
-      merge-editor = "vimdiff";
-    };
+      ui = {
+        merge-editor = "vimdiff";
+      };
 
-    fix.tools.ruffcheck = {
-      command = ["ruff" "check" "--fix" "--stdin-filename=$path" "-"];
-      patterns = ["glob:'**/*.py'"];
-    };
+      fix.tools.ruffcheck = {
+        command = [
+          "ruff"
+          "check"
+          "--fix"
+          "--stdin-filename=$path"
+          "-"
+        ];
+        patterns = [ "glob:'**/*.py'" ];
+      };
 
-    fix.tools.ruffformat = {
-      command = ["ruff" "format" "--stdin-filename=$path" "-"];
-      patterns = ["glob:'**/*.py'"];
-    };
+      fix.tools.ruffformat = {
+        command = [
+          "ruff"
+          "format"
+          "--stdin-filename=$path"
+          "-"
+        ];
+        patterns = [ "glob:'**/*.py'" ];
+      };
 
-    aliases = {
-      tug = ["bookmark" "move" "--from" "heads(::@- & bookmarks())" "--to" "@-"];
-    };
+      aliases = {
+        tug = [
+          "bookmark"
+          "move"
+          "--from"
+          "heads(::@- & bookmarks())"
+          "--to"
+          "@-"
+        ];
+      };
     };
   };
 
