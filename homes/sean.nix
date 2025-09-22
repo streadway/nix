@@ -73,6 +73,10 @@
     options = [ "--cmd cd" ];
   };
 
+  programs.ffmpeg = {
+    enable = true;
+  };
+
   programs.gh.enable = true;
 
   programs.jujutsu = {
