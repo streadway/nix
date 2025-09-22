@@ -35,7 +35,7 @@ in
 
     idleMinutes = mkOption {
       type = types.int;
-      default = 240;
+      default = 120;
       description = "Number of minutes to wait before shutting down when no SSH connections are active (Linux/NixOS only)";
     };
   };
