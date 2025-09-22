@@ -1,4 +1,10 @@
-{ config, lib, system, pkgs, ... }:
+{
+  config,
+  lib,
+  system,
+  pkgs,
+  ...
+}:
 
 {
   programs.nixvim = {

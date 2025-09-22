@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   virtualisation.docker = {
@@ -9,5 +14,5 @@
   };
 
   # Ensure docker group exists
-  users.groups.docker = {};
+  users.groups.docker = { };
 }

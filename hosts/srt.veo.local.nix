@@ -1,4 +1,9 @@
-{ pkgs, config, system, ... }:
+{
+  pkgs,
+  config,
+  system,
+  ...
+}:
 
 {
   imports = [
@@ -70,7 +75,10 @@
 
     '';
     dataDir = "/Users/sean/.local/postgres/17";
-    initdbArgs = [ "--locale=en_US.UTF-8" "--encoding=UTF-8" ];
+    initdbArgs = [
+      "--locale=en_US.UTF-8"
+      "--encoding=UTF-8"
+    ];
     enableTCPIP = true;
     ensureDatabases = [
       "zola"
@@ -92,9 +100,9 @@
     extraPlugins = [ ];
     settings = {
       # Disable durability for faster performance
-      fsync = false;                     # Don't force syncs to disk
-      synchronous_commit = "off";        # Don't wait for WAL writes
-      full_page_writes = false;          # Disable full page writes
+      fsync = false; # Don't force syncs to disk
+      synchronous_commit = "off"; # Don't wait for WAL writes
+      full_page_writes = false; # Disable full page writes
     };
   };
 

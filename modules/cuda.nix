@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # Load nvidia_uvm kernel module for CUDA support (others loaded automatically)
@@ -13,7 +18,7 @@
   };
 
   # Load NVIDIA driver for Xorg and Wayland
-  services.xserver.videoDrivers = ["nvidia"];
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   # NVIDIA hardware configuration
   hardware.nvidia = {
