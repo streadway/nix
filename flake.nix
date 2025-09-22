@@ -84,6 +84,15 @@
                 imports = [
                   ./homes/sean.nix
                   ./homes/dev/rs.nix
+
+                  ./homes/dev/aws.nix
+                  ./homes/dev/heroku.nix
+                  ./homes/dev/k8s.nix
+
+                  ./homes/dev/py.nix
+                  ./homes/dev/rs.nix
+                  ./homes/dev/sh.nix
+                  ./homes/dev/js.nix
                 ];
               };
             }
