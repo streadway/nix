@@ -112,6 +112,15 @@
         patterns = [ "glob:'**/*.py'" ];
       };
 
+      fix.tools.nixfmt = {
+        command = [
+          "nixfmt"
+          "--verify"
+          "--filename=$path"
+        ];
+        patterns = [ "glob:'**/*.nix'" ];
+      };
+
       aliases = {
         tug = [
           "bookmark"
