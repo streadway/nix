@@ -23,7 +23,7 @@
     grafana-loki
     htop
     nmap
-    openapi-generator-cli
+    package-version-server # for Zed
     plantuml
     postgresql_17
     terraform
