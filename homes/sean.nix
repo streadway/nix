@@ -12,7 +12,7 @@
     cacert
     claude-code
     difftastic
-    #ffmpeg-full
+    ffmpeg
     gg-jj # jj ui
     grafana-loki
     htop
@@ -71,10 +71,6 @@
     enable = true;
     enableFishIntegration = true;
     options = [ "--cmd cd" ];
-  };
-
-  programs.ffmpeg = {
-    enable = true;
   };
 
   programs.gh.enable = true;
