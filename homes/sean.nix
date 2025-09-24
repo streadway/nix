@@ -145,4 +145,6 @@
       credential."https://github.com".useHttpPath = true;
     };
   };
+
+  programs.nix-index.enable = true;
 }
