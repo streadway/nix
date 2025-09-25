@@ -27,6 +27,17 @@
     ];
   };
 
+  users.users.noverby = {
+    isNormalUser = true;
+    extraGroups = [
+      "wheel"
+      "docker"
+    ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOachAYzBH8Qaorvbck99Fw+v6md3BeVtfL5PJ/byv4C niclas@overby.me"
+    ];
+  };
+
   services.sshIdleShutdown = {
     enable = true;
     idleMinutes = 300;
