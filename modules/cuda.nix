@@ -7,10 +7,13 @@
 
 {
   # Load nvidia_uvm kernel module for CUDA support (others loaded automatically)
-  boot.kernelModules = [ "nvidia_uvm" ];
+  # boot.kernelModules = [ "nvidia_uvm" ];
 
   # Enable CUDA support globally (best with cachix nix-community)
-  nixpkgs.config.cudaSupport = true;
+  nixpkgs.config = {
+    cudaSupport = true;
+    rocmSupport = false;
+  };
 
   # Enable graphics/OpenGL
   hardware.graphics = {
@@ -49,11 +52,11 @@
     nvidiaSettings = true;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
   # Speedup CUDA startup
-  hardware.nvidia.nvidiaPersistenced = true;
+  # hardware.nvidia.nvidiaPersistenced = true;
 
   # NVIDIA container toolkit for Docker/Podman with CDI as:
   # [x] docker run --gpus all
@@ -61,16 +64,16 @@
   hardware.nvidia-container-toolkit.enable = true;
 
   # CUDA development packages and tools
-  environment.systemPackages = with pkgs; [
-    cudaPackages.cudatoolkit
-    cudaPackages.cudnn
-    nvtopPackages.nvidia
-  ];
+  # environment.systemPackages = with pkgs; [
+  #   cudaPackages.cudatoolkit
+  #   cudaPackages.cudnn
+  #   nvtopPackages.nvidia
+  # ];
 
   # Environment variables for CUDA development
   environment.variables = {
-    CUDA_PATH = "${pkgs.cudaPackages.cudatoolkit}";
-    CUDA_ROOT = "${pkgs.cudaPackages.cudatoolkit}";
-    EXTRA_LDFLAGS = "-L${config.boot.kernelPackages.nvidia_x11}/lib";
+    # CUDA_PATH = "${pkgs.cudaPackages.cudatoolkit}";
+    # CUDA_ROOT = "${pkgs.cudaPackages.cudatoolkit}";
+    # EXTRA_LDFLAGS = "-L${config.boot.kernelPackages.nvidia_x11}/lib";
   };
 }
