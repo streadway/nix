@@ -45,6 +45,7 @@
 
   programs.fish.enable = true;
   programs.direnv.enable = true;
+  programs.nix-ld.enable = true; # needed for generic python executables like ruff
 
   security.sudo.wheelNeedsPassword = false;
 
