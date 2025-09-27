@@ -18,18 +18,23 @@ let
     }
 
     is_shutdown_active() {
-        ${pkgs.systemd}/bin/shutdown --show > /dev/null 2>&1
+        ${pkgs.systemd}/bin/shutdown --show 2>&1
     }
 
     if is_ssh_active; then
         if is_shutdown_active; then
             echo "SSH re-established, cancelling shutdown"
             ${pkgs.systemd}/bin/shutdown -c
+        else
+            echo "SSH established:"
+            who
         fi
     else
         if ! is_shutdown_active; then
-            echo "SSH not active, shutdown in $idleMinutes minutes"
-            ${pkgs.systemd}/bin/shutdown "+$idleMinutes" "No SSH connections, shutting down"
+            echo "SSH not active, shutting down in $idleMinutes minutes"
+            ${pkgs.systemd}/bin/shutdown -h "+$idleMinutes" "No SSH connections"
+        else
+            echo "SSH not active, shutdown pending"
         fi
     fi
   '';
