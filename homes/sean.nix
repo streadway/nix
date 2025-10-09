@@ -10,30 +10,25 @@
     if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
   home.stateVersion = "24.05";
 
-  home.packages =
-    with pkgs;
-    [
-      _1password-cli
-      act
-      ssm-session-manager-plugin
-      bat
-      cacert
-      claude-code
-      difftastic
-      ffmpeg
-      gg-jj # jj ui
-      grafana-loki
-      htop
-      nmap
-      package-version-server # for Zed
-      plantuml
-      postgresql_17
-      terraform
-      wget
-    ]
-    ++ lib.optional pkgs.stdenv.isDarwin [
-      darwin.PowerManagement # caffeniate
-    ];
+  home.packages = with pkgs; [
+    _1password-cli
+    act
+    ssm-session-manager-plugin
+    bat
+    cacert
+    difftastic
+    ffmpeg
+    gg-jj # jj ui
+    grafana-loki
+    htop
+    nmap
+    ripgrep
+    package-version-server # for Zed
+    plantuml
+    postgresql_17
+    terraform
+    wget
+  ];
 
   home.file.".ssh/config" = {
     text = ''

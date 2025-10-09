@@ -103,6 +103,11 @@
       fsync = false; # Don't force syncs to disk
       synchronous_commit = "off"; # Don't wait for WAL writes
       full_page_writes = false; # Disable full page writes
+
+      # Enable pg_stat_statements
+      shared_preload_libraries = "pg_stat_statements";
+      "pg_stat_statements.track" = "all";
+      "pg_stat_statements.max" = "100000";
     };
   };
 
