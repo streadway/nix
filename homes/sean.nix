@@ -16,6 +16,7 @@
     ssm-session-manager-plugin
     bat
     cacert
+    claude-code
     difftastic
     ffmpeg
     gg-jj # jj ui
@@ -136,13 +137,13 @@
 
   programs.git = {
     enable = true;
-    userName = "Sean Treadway";
-    userEmail = "srt@veo.co";
-    aliases = {
-      co = "checkout";
-    };
+      userName = "Sean Treadway";
+      userEmail = "srt@veo.co";
+      aliases = {
+        co = "checkout";
+      };
     extraConfig = {
-      credential."https://github.com".useHttpPath = true;
+      #credential."https://github.com".useHttpPath = true;
     };
   };
 

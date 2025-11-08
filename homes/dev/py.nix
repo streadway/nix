@@ -3,7 +3,7 @@
   home.packages = with pkgs; [
     ruff
     python3
-    #basedpyright # for Zed lsp
+    basedpyright # for Zed lsp
   ];
 
   programs.uv.enable = true;

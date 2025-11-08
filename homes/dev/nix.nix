@@ -4,5 +4,6 @@
     nil # lsp
     nixd # lsp
     nixfmt
+    alejandra
   ];
 }
