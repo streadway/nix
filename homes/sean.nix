@@ -3,11 +3,12 @@
   lib,
   pkgs,
   ...
-}:
-{
+}: {
   home.username = "sean";
   home.homeDirectory =
-    if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
+    if pkgs.stdenv.isDarwin
+    then "/Users/${config.home.username}"
+    else "/home/${config.home.username}";
   home.stateVersion = "24.05";
 
   home.packages = with pkgs; [
@@ -19,11 +20,13 @@
     claude-code
     difftastic
     ffmpeg
+    gemini-cli
     gg-jj # jj ui
     grafana-loki
     htop
     nmap
     ripgrep
+    opencode
     package-version-server # for Zed
     plantuml
     postgresql_17
@@ -58,7 +61,7 @@
         src = pkgs.fishPlugins.tide.src;
       }
     ];
-    shellAliases = { };
+    shellAliases = {};
     shellInit = ''
       # Custom fish shell initialization
       set -g fish_greeting ""  # Disable greeting
@@ -75,7 +78,7 @@
   programs.zoxide = {
     enable = true;
     enableFishIntegration = true;
-    options = [ "--cmd cd" ];
+    options = ["--cmd cd"];
   };
 
   programs.gh.enable = true;
@@ -100,7 +103,7 @@
           "--stdin-filename=$path"
           "-"
         ];
-        patterns = [ "glob:'**/*.py'" ];
+        patterns = ["glob:'**/*.py'"];
       };
 
       fix.tools.ruffformat = {
@@ -110,7 +113,7 @@
           "--stdin-filename=$path"
           "-"
         ];
-        patterns = [ "glob:'**/*.py'" ];
+        patterns = ["glob:'**/*.py'"];
       };
 
       fix.tools.nixfmt = {
@@ -119,7 +122,7 @@
           "--verify"
           "--filename=$path"
         ];
-        patterns = [ "glob:'**/*.nix'" ];
+        patterns = ["glob:'**/*.nix'"];
       };
 
       aliases = {
@@ -137,12 +140,12 @@
 
   programs.git = {
     enable = true;
-      userName = "Sean Treadway";
-      userEmail = "srt@veo.co";
+    settings = {
+      user.name = "Sean Treadway";
+      user.email = "srt@veo.co";
       aliases = {
         co = "checkout";
       };
-    extraConfig = {
       #credential."https://github.com".useHttpPath = true;
     };
   };

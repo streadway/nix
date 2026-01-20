@@ -3,9 +3,7 @@
   config,
   system,
   ...
-}:
-
-{
+}: {
   imports = [
     ../modules/nix.nix
     ../modules/nvim.nix
@@ -64,7 +62,7 @@
 
   services.postgresql = {
     enable = true;
-    package = pkgs.postgresql_17;
+    package = pkgs.postgresql_18;
     authentication = pkgs.lib.mkOverride 10 ''
       #type database DBuser host      auth-method
       local all     all              trust
@@ -74,7 +72,7 @@
       host  all     all   all       scram-sha-256
 
     '';
-    dataDir = "/Users/sean/.local/postgres/17";
+    dataDir = "/Users/sean/.local/postgres/18";
     initdbArgs = [
       "--locale=en_US.UTF-8"
       "--encoding=UTF-8"
@@ -97,7 +95,7 @@
         };
       }
     ];
-    extraPlugins = [ ];
+    extraPlugins = [];
     settings = {
       # Disable durability for faster performance
       fsync = false; # Don't force syncs to disk
