@@ -3,12 +3,11 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+{
   home.username = "sean";
   home.homeDirectory =
-    if pkgs.stdenv.isDarwin
-    then "/Users/${config.home.username}"
-    else "/home/${config.home.username}";
+    if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
   home.stateVersion = "24.05";
 
   home.packages = with pkgs; [
@@ -43,14 +42,19 @@
     '';
   };
 
-  home.sessionPath = [
-    "node_modules/.bin"
-    "~/.local/npm-packages/bin"
-    "~/.local/bin"
-    "~/bin"
-    "~/go/bin"
-    "~/.cargo/bin"
-  ];
+  home.sessionPath =
+    (lib.optionals pkgs.stdenv.isDarwin [
+      "/opt/homebrew/bin"
+      "/opt/homebrew/sbin"
+    ])
+    ++ [
+      "node_modules/.bin"
+      "~/.local/npm-packages/bin"
+      "~/.local/bin"
+      "~/bin"
+      "~/go/bin"
+      "~/.cargo/bin"
+    ];
 
   # Fish shell configuration
   programs.fish = {
@@ -61,7 +65,7 @@
         src = pkgs.fishPlugins.tide.src;
       }
     ];
-    shellAliases = {};
+    shellAliases = { };
     shellInit = ''
       # Custom fish shell initialization
       set -g fish_greeting ""  # Disable greeting
@@ -78,7 +82,7 @@
   programs.zoxide = {
     enable = true;
     enableFishIntegration = true;
-    options = ["--cmd cd"];
+    options = [ "--cmd cd" ];
   };
 
   programs.gh.enable = true;
@@ -103,7 +107,7 @@
           "--stdin-filename=$path"
           "-"
         ];
-        patterns = ["glob:'**/*.py'"];
+        patterns = [ "glob:'**/*.py'" ];
       };
 
       fix.tools.ruffformat = {
@@ -113,7 +117,7 @@
           "--stdin-filename=$path"
           "-"
         ];
-        patterns = ["glob:'**/*.py'"];
+        patterns = [ "glob:'**/*.py'" ];
       };
 
       fix.tools.nixfmt = {
@@ -122,7 +126,7 @@
           "--verify"
           "--filename=$path"
         ];
-        patterns = ["glob:'**/*.nix'"];
+        patterns = [ "glob:'**/*.nix'" ];
       };
 
       aliases = {

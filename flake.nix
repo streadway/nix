@@ -36,6 +36,11 @@
       url = "github:zhaofengli/nix-homebrew";
     };
 
+    schpet-tap = {
+      url = "github:schpet/homebrew-tap";
+      flake = false;
+    };
+
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -56,104 +61,131 @@
     };
   };
 
-  outputs = inputs @ {
-    self,
-    nixpkgs,
-    nixpkgs-stable,
-    nix-darwin,
-    home-manager,
-    nix-homebrew,
-    nixvim,
-    nixos-wsl,
-    nixos-raspberrypi,
-    disko,
-  }: let
-    system.configurationRevision = self.rev or self.dirtyRev or null;
-  in {
-    darwinConfigurations = {
-      veo = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
-        modules = [
-          ./hosts/srt.veo.local.nix
-          nixvim.nixDarwinModules.nixvim
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.users.sean = {...}: {
-              imports = [
-                ./homes/sean.nix
-                ./homes/dev/aws.nix
-                ./homes/dev/heroku.nix
-                ./homes/dev/k8s.nix
+  outputs =
+    inputs@{
+      self,
+      nixpkgs,
+      nixpkgs-stable,
+      nix-darwin,
+      home-manager,
+      nix-homebrew,
+      schpet-tap,
+      nixvim,
+      nixos-wsl,
+      nixos-raspberrypi,
+      disko,
+    }:
+    let
+      system.configurationRevision = self.rev or self.dirtyRev or null;
+    in
+    {
+      darwinConfigurations = {
+        veo = nix-darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          modules = [
+            nix-homebrew.darwinModules.nix-homebrew
+            ./hosts/srt.veo.local.nix
+            nixvim.nixDarwinModules.nixvim
+            home-manager.darwinModules.home-manager
+            {
+              nix-homebrew = {
+                enable = true;
+                enableRosetta = true;
+                user = "sean";
+                autoMigrate = true;
+                taps = {
+                  "schpet/homebrew-tap" = schpet-tap;
+                };
+                mutableTaps = false;
+              };
+            }
+            (
+              { config, ... }:
+              {
+                homebrew.taps = builtins.attrNames config.nix-homebrew.taps;
+              }
+            )
+            {
+              home-manager.users.sean =
+                { ... }:
+                {
+                  imports = [
+                    ./homes/sean.nix
+                    ./homes/dev/aws.nix
+                    ./homes/dev/heroku.nix
+                    ./homes/dev/k8s.nix
 
-                ./homes/dev/py.nix
-                ./homes/dev/rs.nix
-                ./homes/dev/sh.nix
-                ./homes/dev/js.nix
-                ./homes/dev/go.nix
-                ./homes/dev/nix.nix
-              ];
-            };
+                    ./homes/dev/py.nix
+                    ./homes/dev/rs.nix
+                    ./homes/dev/sh.nix
+                    ./homes/dev/js.nix
+                    ./homes/dev/go.nix
+                    ./homes/dev/nix.nix
+                  ];
+                };
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+            }
+          ];
+        };
+      };
+
+      nixosConfigurations.pi = nixos-raspberrypi.lib.nixosSystem {
+        specialArgs = inputs;
+        modules = [
+          nixos-raspberrypi.nixosModules.sd-image
+          ./hosts/pi.local.nix
+        ];
+      };
+
+      nixosConfigurations.ws-srt = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./hosts/ws-srt.dev.core.veo.co.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.sean =
+              { ... }:
+              {
+                imports = [
+                  ./homes/sean.nix
+                  ./homes/dev/rs.nix
+
+                  ./homes/dev/aws.nix
+                  ./homes/dev/heroku.nix
+                  ./homes/dev/k8s.nix
+
+                  ./homes/dev/py.nix
+                  ./homes/dev/rs.nix
+                  ./homes/dev/sh.nix
+                  ./homes/dev/js.nix
+                  ./homes/dev/nix.nix
+                ];
+              };
+          }
+        ];
+      };
+
+      nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs nixpkgs nixpkgs-stable; };
+        modules = [
+          ./hosts/wsl.local.nix
+          nixvim.nixosModules.nixvim
+          nixos-wsl.nixosModules.default
+          {
+            system.stateVersion = "24.05";
+            wsl.enable = true;
+            wsl.defaultUser = "sean";
+          }
+          home-manager.nixosModules.home-manager
+          {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
           }
         ];
       };
     };
-
-    nixosConfigurations.pi = nixos-raspberrypi.lib.nixosSystem {
-      specialArgs = inputs;
-      modules = [
-        nixos-raspberrypi.nixosModules.sd-image
-        ./hosts/pi.local.nix
-      ];
-    };
-
-    nixosConfigurations.ws-srt = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./hosts/ws-srt.dev.core.veo.co.nix
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.sean = {...}: {
-            imports = [
-              ./homes/sean.nix
-              ./homes/dev/rs.nix
-
-              ./homes/dev/aws.nix
-              ./homes/dev/heroku.nix
-              ./homes/dev/k8s.nix
-
-              ./homes/dev/py.nix
-              ./homes/dev/rs.nix
-              ./homes/dev/sh.nix
-              ./homes/dev/js.nix
-              ./homes/dev/nix.nix
-            ];
-          };
-        }
-      ];
-    };
-
-    nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      specialArgs = {inherit inputs nixpkgs nixpkgs-stable;};
-      modules = [
-        ./hosts/wsl.local.nix
-        nixvim.nixosModules.nixvim
-        nixos-wsl.nixosModules.default
-        {
-          system.stateVersion = "24.05";
-          wsl.enable = true;
-          wsl.defaultUser = "sean";
-        }
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-        }
-      ];
-    };
-  };
 }

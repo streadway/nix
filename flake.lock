@@ -314,7 +314,24 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-stable": "nixpkgs-stable",
-        "nixvim": "nixvim"
+        "nixvim": "nixvim",
+        "schpet-tap": "schpet-tap"
+      }
+    },
+    "schpet-tap": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771304430,
+        "narHash": "sha256-f5JI3wE4OSREcJ5nIAvTQ4Mr8rSakrmYm86a7tIE1bE=",
+        "owner": "schpet",
+        "repo": "homebrew-tap",
+        "rev": "99962e6c8d4831e9ebd93b76485b0e05c0b6a82f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "schpet",
+        "repo": "homebrew-tap",
+        "type": "github"
       }
     },
     "systems": {

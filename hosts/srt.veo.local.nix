@@ -3,7 +3,8 @@
   config,
   system,
   ...
-}: {
+}:
+{
   imports = [
     ../modules/nix.nix
     ../modules/nvim.nix
@@ -39,9 +40,13 @@
 
   homebrew = {
     enable = true;
-    onActivation.cleanup = "zap";
+    onActivation = {
+      cleanup = "zap";
+      upgrade = true;
+    };
 
     brews = [
+      "schpet/homebrew-tap/linear"
     ];
 
     casks = [
@@ -95,7 +100,7 @@
         };
       }
     ];
-    extraPlugins = [];
+    extraPlugins = [ ];
     settings = {
       # Disable durability for faster performance
       fsync = false; # Don't force syncs to disk
