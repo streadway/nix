@@ -59,11 +59,17 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
     };
+
+    codex-cli-nix = {
+      url = "github:sadjow/codex-cli-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     inputs@{
       self,
+      codex-cli-nix,
       nixpkgs,
       nixpkgs-stable,
       nix-darwin,
@@ -123,6 +129,7 @@
                     ./homes/dev/nix.nix
                   ];
                 };
+              home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
             }
@@ -144,6 +151,7 @@
           ./hosts/ws-srt.dev.core.veo.co.nix
           home-manager.nixosModules.home-manager
           {
+            home-manager.extraSpecialArgs = { inherit inputs; };
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.sean =
@@ -182,6 +190,7 @@
           }
           home-manager.nixosModules.home-manager
           {
+            home-manager.extraSpecialArgs = { inherit inputs; };
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
           }

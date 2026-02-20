@@ -1,10 +1,10 @@
 {
+  inputs,
   pkgs,
   config,
   system,
   ...
-}:
-{
+}: {
   imports = [
     ../modules/nix.nix
     ../modules/nvim.nix
@@ -100,7 +100,7 @@
         };
       }
     ];
-    extraPlugins = [ ];
+    extraPlugins = [];
     settings = {
       # Disable durability for faster performance
       fsync = false; # Don't force syncs to disk

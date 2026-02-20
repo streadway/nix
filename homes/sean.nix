@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   lib,
   pkgs,
@@ -26,6 +27,7 @@
     nmap
     ripgrep
     opencode
+    inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
     package-version-server # for Zed
     plantuml
     postgresql_17
@@ -73,7 +75,7 @@
   };
 
   programs.mise = {
-    enable = true;
+    enable = false;
     enableFishIntegration = true;
   };
 
