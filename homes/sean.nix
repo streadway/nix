@@ -38,6 +38,15 @@
 
   home.file.".ssh/config" = {
     text = ''
+      Include ~/.orbstack/ssh/config
+
+      Host orb-builder-amd64
+        HostName localhost
+        Port 32222
+        UserKnownHostsFile ~/.orbstack/ssh/known_hosts
+        IdentityFile ~/.orbstack/ssh/id_ed25519
+        IdentitiesOnly yes
+
       Host *
         ForwardAgent yes
         AddKeysToAgent yes

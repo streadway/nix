@@ -10,6 +10,41 @@
     ../modules/nvim.nix
   ];
 
+  nix = {
+    distributedBuilds = true;
+    buildMachines = [
+      {
+        hostName = "orb-builder-amd64";
+        protocol = "ssh-ng";
+        # OrbStack routes to machine "<name>" when used as SSH user against the OrbStack endpoint.
+        sshUser = "nix-builder-amd64-v2";
+        sshKey = "/Users/sean/.orbstack/ssh/id_ed25519";
+        systems = ["x86_64-linux"];
+        maxJobs = 8;
+        speedFactor = 1;
+        supportedFeatures = [
+          "benchmark"
+          "big-parallel"
+        ];
+      }
+    ];
+
+    settings = {
+      builders-use-substitutes = true;
+      # Keep local darwin builds enabled; offload x86_64-linux to Orb via buildMachines.
+      max-jobs = 8;
+    };
+  };
+
+  programs.ssh.extraConfig = ''
+    Host orb-builder-amd64
+      HostName localhost
+      Port 32222
+      UserKnownHostsFile /Users/sean/.orbstack/ssh/known_hosts
+      IdentityFile /Users/sean/.orbstack/ssh/id_ed25519
+      IdentitiesOnly yes
+  '';
+
   system = {
     primaryUser = "sean";
     primaryUserHome = "/Users/sean";
