@@ -22,6 +22,7 @@
     ffmpeg
     gemini-cli
     gg-jj # jj ui
+    google-cloud-sdk
     grafana-loki
     htop
     nmap
