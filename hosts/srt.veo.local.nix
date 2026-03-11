@@ -82,6 +82,7 @@
 
     brews = [
       "schpet/homebrew-tap/linear"
+      "mole"
     ];
 
     casks = [
