@@ -1,10 +1,8 @@
 {
   pkgs,
-  config,
-  inputs,
-  system,
   ...
-}: {
+}:
+{
   nix = {
     package = pkgs.nix;
 
@@ -30,13 +28,6 @@
 
     gc = {
       automatic = true;
-    };
-  };
-
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-      allowUnfreePredicate = _: true;
     };
   };
 

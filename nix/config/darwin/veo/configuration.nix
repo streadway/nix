@@ -1,13 +1,12 @@
 {
-  inputs,
   pkgs,
   config,
-  system,
   ...
 }: {
   imports = [
-    ../modules/nvim.nix
-    ../modules/determinate-darwin.nix
+    ../../../modules/darwin/homebrew.nix
+    ../../../modules/darwin/nixvim.nix
+    ../../../modules/darwin/determinate.nix
   ];
 
   system = {

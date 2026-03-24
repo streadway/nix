@@ -4,7 +4,8 @@
   lib,
   nixos-raspberrypi,
   ...
-}: {
+}:
+{
   # Hardware specific configuration
   imports = with nixos-raspberrypi.nixosModules; [
     raspberry-pi-5.base
@@ -64,7 +65,7 @@
   # PostgreSQL for Blocky query logging
   services.postgresql = {
     enable = true;
-    ensureDatabases = ["blocky"];
+    ensureDatabases = [ "blocky" ];
     ensureUsers = [
       {
         name = "blocky";
@@ -83,8 +84,8 @@
 
   # Grant Grafana read access to blocky database
   systemd.services.postgresql-grant-grafana = {
-    after = ["postgresql.service"];
-    wantedBy = ["multi-user.target"];
+    after = [ "postgresql.service" ];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -139,8 +140,8 @@
 
   # Import Blocky dashboard from Grafana.com
   systemd.services.grafana-import-blocky-dashboard = {
-    wantedBy = ["multi-user.target"];
-    after = ["grafana.service"];
+    wantedBy = [ "multi-user.target" ];
+    after = [ "grafana.service" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -170,16 +171,19 @@
       # Bootstrap DNS for initial DoH resolution
       bootstrapDns = {
         upstream = "https://one.one.one.one/dns-query";
-        ips = ["1.1.1.1" "1.0.0.1"];
+        ips = [
+          "1.1.1.1"
+          "1.0.0.1"
+        ];
       };
 
       # Ad blocking configuration
       blocking = {
         denylists = {
-          ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
+          ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
         };
         clientGroupsBlock = {
-          default = ["ads"];
+          default = [ "ads" ];
         };
       };
 
@@ -201,7 +205,14 @@
         target = "postgres://blocky@localhost:5432/blocky?sslmode=disable";
         logRetentionDays = 30;
         flushInterval = "30s";
-        fields = ["clientIP" "clientName" "responseReason" "responseAnswer" "question" "duration"];
+        fields = [
+          "clientIP"
+          "clientName"
+          "responseReason"
+          "responseAnswer"
+          "question"
+          "duration"
+        ];
       };
     };
   };
@@ -211,8 +222,13 @@
 
   # Open DNS, Blocky API, BlockyUI, and Grafana ports in firewall
   networking.firewall = {
-    allowedTCPPorts = [53 4000 3000 3001];
-    allowedUDPPorts = [53];
+    allowedTCPPorts = [
+      53
+      4000
+      3000
+      3001
+    ];
+    allowedUDPPorts = [ 53 ];
   };
 
   # BlockyUI container
@@ -221,7 +237,7 @@
     containers = {
       blocky-ui = {
         image = "gabrielduartem/blocky-ui:latest";
-        ports = ["3000:3000"];
+        ports = [ "3000:3000" ];
         environment = {
           BLOCKY_API_URL = "http://127.0.0.1:4000";
         };
@@ -230,11 +246,13 @@
   };
 
   # System tags for boot loader
-  system.nixos.tags = let
-    cfg = config.boot.loader.raspberryPi;
-  in [
-    "raspberry-pi-${cfg.variant}"
-    cfg.bootloader
-    config.boot.kernelPackages.kernel.version
-  ];
+  system.nixos.tags =
+    let
+      cfg = config.boot.loader.raspberryPi;
+    in
+    [
+      "raspberry-pi-${cfg.variant}"
+      cfg.bootloader
+      config.boot.kernelPackages.kernel.version
+    ];
 }

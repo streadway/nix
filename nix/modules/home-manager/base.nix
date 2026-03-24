@@ -4,34 +4,35 @@
   lib,
   pkgs,
   ...
-}:
-{
-  home.username = "sean";
+}: {
+  home.username = config.home.username or "sean";
   home.homeDirectory =
-    if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
+    if pkgs.stdenv.isDarwin
+    then "/Users/${config.home.username}"
+    else "/home/${config.home.username}";
   home.stateVersion = "24.05";
 
   home.packages = with pkgs; [
     _1password-cli
     act
-    ssm-session-manager-plugin
     bat
     cacert
     claude-code
     difftastic
     ffmpeg
     gemini-cli
-    gg-jj # jj ui
     google-cloud-sdk
     grafana-loki
     htop
-    nmap
-    ripgrep
-    opencode
     inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
+    jjui
+    nmap
+    opencode
     package-version-server # for Zed
     plantuml
     postgresql_17
+    ripgrep
+    ssm-session-manager-plugin
     terraform
     wget
   ];
@@ -39,13 +40,6 @@
   home.file.".ssh/config" = {
     text = ''
       Include ~/.orbstack/ssh/config
-
-      Host orb-builder-amd64
-        HostName localhost
-        Port 32222
-        UserKnownHostsFile ~/.orbstack/ssh/known_hosts
-        IdentityFile ~/.orbstack/ssh/id_ed25519
-        IdentitiesOnly yes
 
       Host *
         ForwardAgent yes
@@ -77,7 +71,7 @@
         src = pkgs.fishPlugins.tide.src;
       }
     ];
-    shellAliases = { };
+    shellAliases = {};
     shellInit = ''
       # Custom fish shell initialization
       set -g fish_greeting ""  # Disable greeting
@@ -94,7 +88,7 @@
   programs.zoxide = {
     enable = true;
     enableFishIntegration = true;
-    options = [ "--cmd cd" ];
+    options = ["--cmd cd"];
   };
 
   programs.gh.enable = true;
@@ -119,7 +113,7 @@
           "--stdin-filename=$path"
           "-"
         ];
-        patterns = [ "glob:'**/*.py'" ];
+        patterns = ["glob:'**/*.py'"];
       };
 
       fix.tools.ruffformat = {
@@ -129,7 +123,7 @@
           "--stdin-filename=$path"
           "-"
         ];
-        patterns = [ "glob:'**/*.py'" ];
+        patterns = ["glob:'**/*.py'"];
       };
 
       fix.tools.nixfmt = {
@@ -138,7 +132,7 @@
           "--verify"
           "--filename=$path"
         ];
-        patterns = [ "glob:'**/*.nix'" ];
+        patterns = ["glob:'**/*.nix'"];
       };
 
       aliases = {

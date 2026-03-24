@@ -9,10 +9,10 @@
 {
   imports = [
     "${modulesPath}/virtualisation/amazon-image.nix"
-    ../modules/nix.nix
-    ../modules/cuda.nix
-    ../modules/docker-server.nix
-    ../modules/ssh-idle-shutdown.nix
+    ../../../modules/nixos/nix.nix
+    ../../../modules/nixos/cuda.nix
+    ../../../modules/nixos/docker-server.nix
+    ../../../modules/nixos/ssh-idle-shutdown.nix
   ];
 
   users.users.sean = {

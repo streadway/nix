@@ -14,10 +14,8 @@
 
 {
   imports = [
-    ../modules/nvim.nix
+    ../../../modules/nixos/nixvim.nix
   ];
-
-  home-manager.users.sean = import ../homes/sean.nix;
 
   nix = {
     package = pkgs.nix;
@@ -27,13 +25,6 @@
     gc = {
       automatic = true;
       options = "--delete-older-than 7d";
-    };
-  };
-
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-      allowUnfreePredicate = (_: true);
     };
   };
 
@@ -52,6 +43,7 @@
   };
 
   users.users.sean = {
+    isNormalUser = true;
     home = "/home/sean";
     shell = pkgs.fish;
   };
@@ -66,6 +58,11 @@
       #type database  DBuser  auth-method
       local all       all     trust
     '';
+  };
+
+  wsl = {
+    enable = true;
+    defaultUser = "sean";
   };
 
   system.stateVersion = "24.05";
