@@ -55,6 +55,10 @@
       url = "github:nvmd/nixos-raspberrypi/main";
     };
 
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+    };
+
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
@@ -72,6 +76,7 @@
     nixpkgs,
     nixpkgs-stable,
     nix-darwin,
+    determinate,
     home-manager,
     nix-homebrew,
     schpet-tap,
@@ -86,6 +91,7 @@
       veo = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [
+          determinate.darwinModules.default
           nix-homebrew.darwinModules.nix-homebrew
           ./hosts/srt.veo.local.nix
           nixvim.nixDarwinModules.nixvim

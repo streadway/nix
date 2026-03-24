@@ -155,7 +155,7 @@
   };
 
   programs.git = {
-    enable = true;
+    enable = false;
     settings = {
       user.name = "Sean Treadway";
       user.email = "srt@veo.co";
