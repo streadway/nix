@@ -1,6 +1,7 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: {
   imports = [
@@ -144,6 +145,10 @@
       };
       controlcenter = {
         BatteryShowPercentage = true;
+        Bluetooth = true;
+        Display = true;
+        NowPlaying = true;
+        Sound = true;
       };
 
       CustomUserPreferences = {

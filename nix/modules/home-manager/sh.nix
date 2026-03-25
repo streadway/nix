@@ -7,8 +7,9 @@
 {
   home.packages = with pkgs; [
     cloc
-    graphviz
     gnumake
+    graphviz
+    hyperfine
     pv
     shellcheck
     tree
