@@ -5,7 +5,7 @@
   pkgs,
   ...
 }: {
-  home.username = config.home.username or "sean";
+  home.username = "sean";
   home.homeDirectory =
     if pkgs.stdenv.isDarwin
     then "/Users/${config.home.username}"
