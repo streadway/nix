@@ -1,3 +1,5 @@
 .DS_Store
 .workspaces/
+.jj
 .jj-*
+result/
