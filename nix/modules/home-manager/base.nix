@@ -62,6 +62,10 @@
       "~/.cargo/bin"
     ];
 
+  home.sessionVariables = {
+    SHELL = "${pkgs.fish}/bin/fish";
+  };
+
   # Fish shell configuration
   programs.fish = {
     enable = true;
