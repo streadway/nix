@@ -3,7 +3,8 @@
   config,
   lib,
   ...
-}: {
+}:
+{
   imports = [
     ../../../modules/darwin/homebrew.nix
     ../../../modules/darwin/nixvim.nix
@@ -21,7 +22,7 @@
   };
 
   environment = {
-    shells = [pkgs.fish];
+    shells = [ pkgs.fish ];
     variables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
@@ -102,7 +103,7 @@
         };
       }
     ];
-    extraPlugins = [];
+    extraPlugins = [ ];
     settings = {
       # Disable durability for faster performance
       fsync = false; # Don't force syncs to disk
@@ -153,29 +154,11 @@
 
       CustomUserPreferences = {
         "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
+        "com.apple.desktopservices" = {
+          DSDontWriteNetworkStores = true;
+          DSDontWriteUSBStores = true;
+        };
       };
-
-      #CustomUserPreferences = {
-      #  # Settings of plist in ~/Library/Preferences/
-      #  "com.apple.finder" = {
-      #    # Set home directory as startup window
-      #    NewWindowTargetPath = "file:///Users/${vars.user}/";
-      #    NewWindowTarget = "PfHm";
-      #    # Set search scope to directory
-      #    FXDefaultSearchScope = "SCcf";
-      #    # Multi-file tab view
-      #    FinderSpawnTab = true;
-      #  };
-      #  "com.apple.desktopservices" = {
-      #    # Disable creating .DS_Store files in network an USB volumes
-      #    DSDontWriteNetworkStores = true;
-      #    DSDontWriteUSBStores = true;
-      #  };
-      #  # Show battery percentage
-      #  "~/Library/Preferences/ByHost/com.apple.controlcenter".BatteryShowPercentage = true;
-      #  # Privacy
-      #  "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
-      #};
     };
   };
 
