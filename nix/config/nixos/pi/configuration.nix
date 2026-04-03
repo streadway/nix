@@ -218,7 +218,15 @@
   };
 
   # Networking configuration
-  networking.useDHCP = lib.mkDefault true;
+  networking = {
+    useDHCP = lib.mkDefault true;
+    # The Pi serves DNS for the LAN, so it must not consume its own DHCP-advertised
+    # resolver address. Pin the host's upstream resolver to the router instead.
+    nameservers = [ "192.168.178.1" ];
+    dhcpcd.extraConfig = ''
+      nohook resolv.conf
+    '';
+  };
 
   # Open DNS, Blocky API, BlockyUI, and Grafana ports in firewall
   networking.firewall = {
@@ -245,14 +253,9 @@
     };
   };
 
-  # System tags for boot loader
-  system.nixos.tags =
-    let
-      cfg = config.boot.loader.raspberryPi;
-    in
-    [
-      "raspberry-pi-${cfg.variant}"
-      cfg.bootloader
-      config.boot.kernelPackages.kernel.version
-    ];
+  # System tags for image identification
+  system.nixos.tags = [
+    "raspberry-pi-5"
+    config.boot.kernelPackages.kernel.version
+  ];
 }
