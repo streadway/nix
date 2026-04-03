@@ -4,16 +4,7 @@
   lib,
   nixos-raspberrypi,
   ...
-}:
-let
-  jellyfinDlnaVersion = "10.0.0.0";
-  jellyfinDlnaPlugin = pkgs.fetchzip {
-    url = "https://repo.jellyfin.org/files/plugin/dlna/dlna_${jellyfinDlnaVersion}.zip";
-    hash = "sha256-EAEnwOA/NzyP3R8JjQLtzYWP62nIYdM3eDPvbpB+kqE=";
-    stripRoot = false;
-  };
-in
-{
+}: {
   # Hardware specific configuration
   imports = with nixos-raspberrypi.nixosModules; [
     raspberry-pi-5.base
@@ -46,26 +37,15 @@ in
   # Enable mDNS for easier access via pi.local
   services.avahi = {
     enable = true;
+    # openFirewall = true;
     nssmdns4 = true;
-    allowInterfaces = [ "end0" ];
+    allowInterfaces = ["end0"];
     publish = {
       enable = true;
       addresses = true;
       domain = true;
       workstation = true;
     };
-    extraServiceFiles.jellyfin = ''
-      <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
-      <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
-      <service-group>
-        <name replace-wildcards="yes">%h Jellyfin</name>
-        <service>
-          <type>_http._tcp</type>
-          <port>8096</port>
-          <txt-record>path=/web/</txt-record>
-        </service>
-      </service-group>
-    '';
   };
 
   # SSH keys for root user
@@ -87,7 +67,6 @@ in
     description = "Anonymous SMB writer for /mnt/media";
     group = "media";
   };
-  users.users.jellyfin.extraGroups = [ "media" ];
 
   # Keep the USB media library mounted declaratively so it is restored across
   # rebuilds and reboots without relying on mutable mount commands.
@@ -103,26 +82,13 @@ in
     ];
   };
 
-  systemd.services.media-share-permissions = {
-    description = "Ensure /mnt/media stays writable for Samba uploads";
-    wantedBy = [ "multi-user.target" ];
-    wants = [ "mnt-media.automount" ];
-    after = [ "mnt-media.automount" ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      ${pkgs.coreutils}/bin/ls /mnt/media >/dev/null
-      ${pkgs.coreutils}/bin/chgrp media /mnt/media
-      ${pkgs.coreutils}/bin/chmod 2775 /mnt/media
-    '';
-  };
-
   # Enable Docker for BlockyUI
   virtualisation.docker.enable = true;
 
   # PostgreSQL for Blocky query logging
   services.postgresql = {
     enable = true;
-    ensureDatabases = [ "blocky" ];
+    ensureDatabases = ["blocky"];
     ensureUsers = [
       {
         name = "blocky";
@@ -141,8 +107,8 @@ in
 
   # Grant Grafana read access to blocky database
   systemd.services.postgresql-grant-grafana = {
-    after = [ "postgresql.service" ];
-    wantedBy = [ "multi-user.target" ];
+    after = ["postgresql.service"];
+    wantedBy = ["multi-user.target"];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -198,20 +164,24 @@ in
   services.jellyfin = {
     enable = true;
     openFirewall = true;
+    user = "media-share";
+    group = "media";
+    # serviceConfig = {
+    #   # Jellyfin writes metadata into /mnt/media; keep it group-readable for the
+    #   # guest SMB account without opening the files to the whole system.
+    #   UMask = lib.mkForce "0113";
+    # };
   };
 
-  systemd.services.jellyfin = {
-    preStart = lib.mkAfter ''
-      pluginDir=${lib.escapeShellArg "${config.services.jellyfin.dataDir}/plugins"}
-      managedPluginRoot=${lib.escapeShellArg "${config.services.jellyfin.cacheDir}/managed-plugins"}
-      managedPluginDir="$managedPluginRoot/dlna-${jellyfinDlnaVersion}"
-
-      ${pkgs.coreutils}/bin/mkdir -p "$pluginDir" "$managedPluginDir"
-      ${pkgs.coreutils}/bin/cp -f ${jellyfinDlnaPlugin}/* "$managedPluginDir"/
-      ${pkgs.coreutils}/bin/chmod u+w "$managedPluginDir"/*
-      ${pkgs.coreutils}/bin/ln -sfn "$managedPluginDir" "$pluginDir/dlna"
-    '';
-    restartTriggers = [ jellyfinDlnaPlugin ];
+  services.minidlna = {
+    enable = true;
+    openFirewall = true;
+    settings = {
+      inotify = "yes";
+      media_dir = [
+        "V,/mnt/media"
+      ];
+    };
   };
 
   services.samba = {
@@ -253,8 +223,8 @@ in
 
   # Import Blocky dashboard from Grafana.com
   systemd.services.grafana-import-blocky-dashboard = {
-    wantedBy = [ "multi-user.target" ];
-    after = [ "grafana.service" ];
+    wantedBy = ["multi-user.target"];
+    after = ["grafana.service"];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -293,10 +263,10 @@ in
       # Ad blocking configuration
       blocking = {
         denylists = {
-          ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
+          ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
         };
         clientGroupsBlock = {
-          default = [ "ads" ];
+          default = ["ads"];
         };
       };
 
@@ -334,8 +304,8 @@ in
   networking = {
     useDHCP = lib.mkDefault true;
     # The Pi serves DNS for the LAN, so it must not consume its own DHCP-advertised
-    # resolver address. Pin the host's upstream resolver to the router instead.
-    nameservers = [ "192.168.178.1" ];
+    # resolver address. Fallback to the host's upstream resolver to the router.
+    nameservers = ["192.168.178.2" "192.168.178.1"];
     dhcpcd.extraConfig = ''
       nohook resolv.conf
     '';
@@ -343,13 +313,14 @@ in
 
   # Open DNS, Blocky API, BlockyUI, and Grafana ports in firewall
   networking.firewall = {
+    enable = true;
     allowedTCPPorts = [
       53
       4000
       3000
       3001
     ];
-    allowedUDPPorts = [ 53 ];
+    allowedUDPPorts = [53];
   };
 
   # BlockyUI container
@@ -358,7 +329,7 @@ in
     containers = {
       blocky-ui = {
         image = "gabrielduartem/blocky-ui:latest";
-        ports = [ "3000:3000" ];
+        ports = ["3000:3000"];
         environment = {
           BLOCKY_API_URL = "http://127.0.0.1:4000";
         };
