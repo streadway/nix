@@ -12,6 +12,7 @@ inputs.nixos-raspberrypi.lib.nixosSystem {
   modules = [
     config.propagationModule
     inputs.nixos-raspberrypi.nixosModules.sd-image
+    ../../../modules/shared/substituters.nix
     ./configuration.nix
   ];
 }

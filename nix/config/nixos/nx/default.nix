@@ -8,6 +8,7 @@
 
   modules = [
     inputs.home-manager.nixosModules.home-manager
+    ../../../modules/shared/substituters.nix
     ./configuration.nix
     {
       home-manager.extraSpecialArgs = { inherit inputs; };

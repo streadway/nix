@@ -10,6 +10,7 @@
     inputs.home-manager.nixosModules.home-manager
     inputs.nixos-wsl.nixosModules.default
     inputs.nixvim.nixosModules.nixvim
+    ../../../modules/shared/substituters.nix
     ./configuration.nix
     {
       home-manager.extraSpecialArgs = { inherit inputs; };

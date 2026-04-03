@@ -11,6 +11,7 @@
     inputs.home-manager.darwinModules.home-manager
     inputs.nix-homebrew.darwinModules.nix-homebrew
     inputs.nixvim.nixDarwinModules.nixvim
+    ../../../modules/shared/substituters.nix
     ./configuration.nix
     {
       home-manager.extraSpecialArgs = { inherit inputs; };
