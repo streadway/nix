@@ -2,6 +2,7 @@
 {
   imports = [
     ./base.nix
+    ./input-remapper.nix
     ./aws.nix
     ./go.nix
     ./heroku.nix

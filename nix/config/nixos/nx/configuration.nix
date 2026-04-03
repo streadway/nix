@@ -91,6 +91,8 @@
     users = [ "sean" ];
   };
 
+  services.input-remapper.enable = true;
+
   services.printing = {
     enable = true;
     openFirewall = true;
@@ -174,18 +176,25 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  environment.variables = {
+    EDITOR = "vim";
+    VISUAL = "vim";
+  };
+
   environment.systemPackages = with pkgs; [
     zed-editor
     git
     jj
+    vim
     unzip
     dig
     _1password-gui
     _1password-cli
+    qbittorrent
+
     lutris
     wineWow64Packages.staging
     winetricks
-    input-remapper
     gnomeExtensions.input-remapper-control
     discord
     nil
@@ -209,6 +218,8 @@
   security.pam.services.gdm-fingerprint.fprintAuth = true;
   security.pam.services.gdm.fprintAuth = true;
   security.pam.services.sudo.fprintAuth = true;
+
+  services.jellyfin.enable = true;
 
   system.stateVersion = "25.11";
 }
