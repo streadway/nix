@@ -91,7 +91,23 @@
     users = [ "sean" ];
   };
 
-  services.input-remapper.enable = true;
+  services.udev.extraHwdb = ''
+    # Razer Naga Epic Chroma side keypad (currently /dev/input/event6 on nx)
+    # Remap the 12-button thumb grid from 1..= to F1..F12, except 4 -> KP_EQUAL.
+    evdev:input:b0003v1532p003Ee0111*
+      KEYBOARD_KEY_7001e=f1
+      KEYBOARD_KEY_7001f=f2
+      KEYBOARD_KEY_70020=f3
+      KEYBOARD_KEY_70021=kpequal
+      KEYBOARD_KEY_70022=f5
+      KEYBOARD_KEY_70023=f6
+      KEYBOARD_KEY_70024=f7
+      KEYBOARD_KEY_70025=f8
+      KEYBOARD_KEY_70026=f9
+      KEYBOARD_KEY_70027=f10
+      KEYBOARD_KEY_7002d=f11
+      KEYBOARD_KEY_7002e=f12
+  '';
 
   services.printing = {
     enable = true;
@@ -195,7 +211,6 @@
     lutris
     wineWow64Packages.staging
     winetricks
-    gnomeExtensions.input-remapper-control
     discord
     nil
     nixd

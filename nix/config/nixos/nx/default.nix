@@ -14,10 +14,7 @@
       home-manager.extraSpecialArgs = { inherit inputs; };
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-      home-manager.users.sean.imports = [
-        ../../../modules/home-manager/full.nix
-        ../../../modules/home-manager/input-remapper.nix
-      ];
+      home-manager.users.sean.imports = [ ../../../modules/home-manager/full.nix ];
     }
   ];
 }
