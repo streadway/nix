@@ -5,6 +5,14 @@
   nixos-raspberrypi,
   ...
 }:
+let
+  jellyfinDlnaVersion = "10.0.0.0";
+  jellyfinDlnaPlugin = pkgs.fetchzip {
+    url = "https://repo.jellyfin.org/files/plugin/dlna/dlna_${jellyfinDlnaVersion}.zip";
+    hash = "sha256-EAEnwOA/NzyP3R8JjQLtzYWP62nIYdM3eDPvbpB+kqE=";
+    stripRoot = false;
+  };
+in
 {
   # Hardware specific configuration
   imports = with nixos-raspberrypi.nixosModules; [
@@ -39,11 +47,25 @@
   services.avahi = {
     enable = true;
     nssmdns4 = true;
+    allowInterfaces = [ "end0" ];
     publish = {
       enable = true;
       addresses = true;
       domain = true;
+      workstation = true;
     };
+    extraServiceFiles.jellyfin = ''
+      <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+      <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+      <service-group>
+        <name replace-wildcards="yes">%h Jellyfin</name>
+        <service>
+          <type>_http._tcp</type>
+          <port>8096</port>
+          <txt-record>path=/web/</txt-record>
+        </service>
+      </service-group>
+    '';
   };
 
   # SSH keys for root user
@@ -58,6 +80,41 @@
     htop
     tmux
   ];
+
+  users.groups.media.gid = 2000;
+  users.users.media-share = {
+    isSystemUser = true;
+    description = "Anonymous SMB writer for /mnt/media";
+    group = "media";
+  };
+  users.users.jellyfin.extraGroups = [ "media" ];
+
+  # Keep the USB media library mounted declaratively so it is restored across
+  # rebuilds and reboots without relying on mutable mount commands.
+  fileSystems."/mnt/media" = {
+    device = "/dev/disk/by-uuid/f4743e05-2236-47c0-bbbc-3aefb16ee327";
+    fsType = "ext4";
+    options = [
+      "nofail"
+      "noatime"
+      "x-systemd.automount"
+      "x-systemd.device-timeout=10s"
+      "x-systemd.idle-timeout=15min"
+    ];
+  };
+
+  systemd.services.media-share-permissions = {
+    description = "Ensure /mnt/media stays writable for Samba uploads";
+    wantedBy = [ "multi-user.target" ];
+    wants = [ "mnt-media.automount" ];
+    after = [ "mnt-media.automount" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      ${pkgs.coreutils}/bin/ls /mnt/media >/dev/null
+      ${pkgs.coreutils}/bin/chgrp media /mnt/media
+      ${pkgs.coreutils}/bin/chmod 2775 /mnt/media
+    '';
+  };
 
   # Enable Docker for BlockyUI
   virtualisation.docker.enable = true;
@@ -137,6 +194,62 @@
       ];
     };
   };
+
+  services.jellyfin = {
+    enable = true;
+    openFirewall = true;
+  };
+
+  systemd.services.jellyfin = {
+    preStart = lib.mkAfter ''
+      pluginDir=${lib.escapeShellArg "${config.services.jellyfin.dataDir}/plugins"}
+      managedPluginRoot=${lib.escapeShellArg "${config.services.jellyfin.cacheDir}/managed-plugins"}
+      managedPluginDir="$managedPluginRoot/dlna-${jellyfinDlnaVersion}"
+
+      ${pkgs.coreutils}/bin/mkdir -p "$pluginDir" "$managedPluginDir"
+      ${pkgs.coreutils}/bin/cp -f ${jellyfinDlnaPlugin}/* "$managedPluginDir"/
+      ${pkgs.coreutils}/bin/chmod u+w "$managedPluginDir"/*
+      ${pkgs.coreutils}/bin/ln -sfn "$managedPluginDir" "$pluginDir/dlna"
+    '';
+    restartTriggers = [ jellyfinDlnaPlugin ];
+  };
+
+  services.samba = {
+    enable = true;
+    openFirewall = true;
+    settings = {
+      global = {
+        "workgroup" = "WORKGROUP";
+        "server string" = "Pi Media Share";
+        "netbios name" = "pi";
+        "security" = "user";
+        "hosts allow" = "192.168.178. 127.0.0.1 localhost";
+        "hosts deny" = "0.0.0.0/0";
+        "guest account" = "media-share";
+        "map to guest" = "bad user";
+        "load printers" = "no";
+        "printing" = "bsd";
+        "printcap name" = "/dev/null";
+        "disable spoolss" = "yes";
+      };
+      media = {
+        "comment" = "Pi media library";
+        "path" = "/mnt/media";
+        "browseable" = "yes";
+        "read only" = "no";
+        "writable" = "yes";
+        "guest ok" = "yes";
+        "guest only" = "yes";
+        "force user" = "media-share";
+        "force group" = "media";
+        "create mask" = "0664";
+        "directory mask" = "2775";
+      };
+    };
+  };
+
+  services.samba.nmbd.enable = true;
+  services.samba.winbindd.enable = false;
 
   # Import Blocky dashboard from Grafana.com
   systemd.services.grafana-import-blocky-dashboard = {
