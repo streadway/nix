@@ -4,7 +4,8 @@
   lib,
   nixos-raspberrypi,
   ...
-}: {
+}:
+{
   # Hardware specific configuration
   imports = with nixos-raspberrypi.nixosModules; [
     raspberry-pi-5.base
@@ -39,7 +40,7 @@
     enable = true;
     # openFirewall = true;
     nssmdns4 = true;
-    allowInterfaces = ["end0"];
+    allowInterfaces = [ "end0" ];
     publish = {
       enable = true;
       addresses = true;
@@ -89,7 +90,7 @@
   # PostgreSQL for Blocky query logging
   services.postgresql = {
     enable = true;
-    ensureDatabases = ["blocky"];
+    ensureDatabases = [ "blocky" ];
     ensureUsers = [
       {
         name = "blocky";
@@ -108,8 +109,8 @@
 
   # Grant Grafana read access to blocky database
   systemd.services.postgresql-grant-grafana = {
-    after = ["postgresql.service"];
-    wantedBy = ["multi-user.target"];
+    after = [ "postgresql.service" ];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -167,11 +168,12 @@
     openFirewall = true;
     user = "media-share";
     group = "media";
-    # serviceConfig = {
-    #   # Jellyfin writes metadata into /mnt/media; keep it group-readable for the
-    #   # guest SMB account without opening the files to the whole system.
-    #   UMask = lib.mkForce "0113";
-    # };
+  };
+
+  systemd.services.jellyfin.serviceConfig = {
+    # Jellyfin writes metadata into /mnt/media; use a collaborative umask so
+    # new files are 0664 and directories are 0775 for SMB access.
+    UMask = lib.mkForce "0002";
   };
 
   services.minidlna = {
@@ -180,7 +182,8 @@
     settings = {
       inotify = "yes";
       media_dir = [
-        "V,/mnt/media"
+        "VP,/mnt/media/Movies"
+        "VP,/mnt/media/Series"
       ];
     };
   };
@@ -224,8 +227,8 @@
 
   # Import Blocky dashboard from Grafana.com
   systemd.services.grafana-import-blocky-dashboard = {
-    wantedBy = ["multi-user.target"];
-    after = ["grafana.service"];
+    wantedBy = [ "multi-user.target" ];
+    after = [ "grafana.service" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -264,10 +267,10 @@
       # Ad blocking configuration
       blocking = {
         denylists = {
-          ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
+          ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
         };
         clientGroupsBlock = {
-          default = ["ads"];
+          default = [ "ads" ];
         };
       };
 
@@ -306,7 +309,10 @@
     useDHCP = lib.mkDefault true;
     # The Pi serves DNS for the LAN, so it must not consume its own DHCP-advertised
     # resolver address. Fallback to the host's upstream resolver to the router.
-    nameservers = ["192.168.178.2" "192.168.178.1"];
+    nameservers = [
+      "192.168.178.2"
+      "192.168.178.1"
+    ];
     dhcpcd.extraConfig = ''
       nohook resolv.conf
     '';
@@ -321,7 +327,7 @@
       3000
       3001
     ];
-    allowedUDPPorts = [53];
+    allowedUDPPorts = [ 53 ];
   };
 
   # BlockyUI container
@@ -330,7 +336,7 @@
     containers = {
       blocky-ui = {
         image = "gabrielduartem/blocky-ui:latest";
-        ports = ["3000:3000"];
+        ports = [ "3000:3000" ];
         environment = {
           BLOCKY_API_URL = "http://127.0.0.1:4000";
         };
