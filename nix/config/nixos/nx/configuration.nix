@@ -49,7 +49,10 @@
     enable = true;
     binfmt = true;
   };
-  programs.nix-ld.enable = true;
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [ libcap ];
+  };
 
   programs.dconf.enable = true;
   programs.dconf.profiles.tm.databases = [
