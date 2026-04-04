@@ -125,6 +125,7 @@
   services.grafana = {
     enable = true;
     settings = {
+      panels.disable_sanitize_html = true;
       server = {
         http_addr = "0.0.0.0";
         http_port = 3001;
@@ -138,9 +139,9 @@
           type = "postgres";
           uid = "blocky-postgresql";
           url = "localhost:5432";
-          database = "blocky";
           user = "grafana";
           jsonData = {
+            database = "blocky";
             sslmode = "disable";
             postgresVersion = 1500;
           };
@@ -150,7 +151,7 @@
           name = "Prometheus";
           type = "prometheus";
           uid = "prometheus";
-          url = "http://localhost:4000";
+          url = "http://localhost:9090";
           isDefault = false;
         }
       ];
@@ -237,6 +238,18 @@
       ${pkgs.coreutils}/bin/mkdir -p /var/lib/grafana/dashboards
       ${pkgs.curl}/bin/curl -o /var/lib/grafana/dashboards/blocky-postgres.json \
         https://grafana.com/api/dashboards/17996/revisions/latest/download
+      ${pkgs.gnused}/bin/sed -i \
+        's/''${DS_BLOCKY-POSTGRESQL}/blocky-postgresql/g' \
+        /var/lib/grafana/dashboards/blocky-postgres.json
+      ${pkgs.curl}/bin/curl -o /var/lib/grafana/dashboards/blocky-prometheus.json \
+        https://grafana.com/api/dashboards/13768/revisions/latest/download
+      ${pkgs.gnused}/bin/sed -i \
+        -e 's/''${DS_PROMETHEUS}/prometheus/g' \
+        -e 's|''${VAR_BLOCKY_URL}|http://192.168.178.2:4000|g' \
+        -e 's/pod=~\\"\\$pod\\"/instance=~\\"\\$instance\\"/g' \
+        -e 's/label_values(blocky_blocking_enabled,pod)/label_values(blocky_blocking_enabled,instance)/g' \
+        -e '0,/\"name\": \"pod\"/s/\"name\": \"pod\"/\"name\": \"instance\"/' \
+        /var/lib/grafana/dashboards/blocky-prometheus.json
       ${pkgs.coreutils}/bin/chown -R grafana:grafana /var/lib/grafana/dashboards
     '';
   };
@@ -282,9 +295,7 @@
       };
 
       # Enable Prometheus metrics
-      prometheus = {
-        enable = true;
-      };
+      prometheus.enable = true;
 
       # Query logging to PostgreSQL
       queryLog = {
@@ -302,6 +313,22 @@
         ];
       };
     };
+  };
+
+  services.prometheus = {
+    enable = true;
+    port = 9090;
+    scrapeConfigs = [
+      {
+        job_name = "blocky";
+        metrics_path = "/metrics";
+        static_configs = [
+          {
+            targets = [ "localhost:4000" ];
+          }
+        ];
+      }
+    ];
   };
 
   # Networking configuration
