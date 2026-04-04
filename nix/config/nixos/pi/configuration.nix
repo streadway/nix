@@ -229,7 +229,11 @@
   # Import Blocky dashboard from Grafana.com
   systemd.services.grafana-import-blocky-dashboard = {
     wantedBy = [ "multi-user.target" ];
-    after = [ "grafana.service" ];
+    wants = [ "network-online.target" ];
+    after = [
+      "grafana.service"
+      "network-online.target"
+    ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -320,6 +324,14 @@
     port = 9090;
     scrapeConfigs = [
       {
+        job_name = "node";
+        static_configs = [
+          {
+            targets = [ "127.0.0.1:9100" ];
+          }
+        ];
+      }
+      {
         job_name = "blocky";
         metrics_path = "/metrics";
         static_configs = [
@@ -328,6 +340,16 @@
           }
         ];
       }
+    ];
+  };
+
+  services.prometheus.exporters.node = {
+    enable = true;
+    listenAddress = "127.0.0.1";
+    enabledCollectors = [
+      "processes"
+      "systemd"
+      "thermal_zone"
     ];
   };
 
