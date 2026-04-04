@@ -10,12 +10,41 @@
     ../../../modules/nixos/nix.nix
   ];
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.systemd-boot.configurationLimit = 5;
-  boot.loader.efi.canTouchEfiVariables = true;
+  nixpkgs.config.allowUnfree = true;
+
+  boot.loader = {
+    systemd-boot.enable = true;
+    systemd-boot.configurationLimit = 5;
+    efi.canTouchEfiVariables = true;
+  };
 
   networking.hostName = "nx";
   networking.networkmanager.enable = true;
+
+  security.sudo.extraConfig = ''
+    Defaults timestamp_timeout=240
+    Defaults !tty_tickets
+    Defaults timestamp_type=global
+  '';
+  security.polkit.enable = true;
+
+  users.users.sean = {
+    isNormalUser = true;
+    description = "Sean";
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
+    shell = pkgs.fish;
+  };
+
+  users.users.tm = {
+    isNormalUser = true;
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
+  };
 
   time.timeZone = "Europe/Berlin";
 
@@ -32,63 +61,55 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  services.xserver = {
+  programs.nix-ld = {
     enable = true;
-    videoDrivers = [ "amdgpu" ];
-    displayManager.gdm.enable = true;
-    displayManager.autoLogin.enable = true;
-    displayManager.autoLogin.user = "sean";
-    desktopManager.gnome.enable = true;
-    xkb = {
-      layout = "us";
-      variant = "";
-    };
+    libraries = with pkgs; [
+      libcap
+    ];
   };
 
   programs.appimage = {
     enable = true;
     binfmt = true;
   };
-  programs.nix-ld = {
-    enable = true;
-    libraries = with pkgs; [ libcap ];
-  };
 
-  programs.dconf.enable = true;
-  programs.dconf.profiles.tm.databases = [
-    {
-      settings = {
-        "org/gnome/desktop/interface" = {
-          gtk-theme = "Nordic";
-          color-scheme = "prefer-dark";
+  programs.dconf = {
+    enable = true;
+    profiles.tm.databases = [
+      {
+        settings = {
+          "org/gnome/desktop/interface" = {
+            gtk-theme = "Nordic";
+            color-scheme = "prefer-dark";
+          };
         };
-      };
-    }
-  ];
-  programs.dconf.profiles.user.databases = [
-    {
-      settings = {
-        "org/gnome/desktop/interface" = {
-          gtk-theme = "Adwaita";
-          color-scheme = "prefer-dark";
+      }
+    ];
+    profiles.user.databases = [
+      {
+        settings = {
+          "org/gnome/desktop/interface" = {
+            gtk-theme = "Adwaita";
+            color-scheme = "prefer-dark";
+          };
+          "org/gnome/desktop/peripherals/keyboard" = {
+            delay = "225";
+            repeat-interval = "30";
+            repeat = true;
+          };
+          "org/gnome/desktop/peripherals/mouse" = {
+            natural-scroll = true;
+          };
+          "org/gnome/desktop/screensaver" = {
+            lock-enabled = true;
+          };
+          "org/gnome/desktop/session" = {
+            idle-delay = "1800";
+          };
         };
-        "org/gnome/desktop/peripherals/keyboard" = {
-          delay = "225";
-          repeat-interval = "30";
-          repeat = true;
-        };
-        "org/gnome/desktop/peripherals/mouse" = {
-          natural-scroll = true;
-        };
-        "org/gnome/desktop/screensaver" = {
-          lock-enabled = true;
-        };
-        "org/gnome/desktop/session" = {
-          idle-delay = "1800";
-        };
-      };
-    }
-  ];
+      }
+    ];
+  };
 
   hardware.openrazer = {
     enable = true;
@@ -113,6 +134,23 @@
       KEYBOARD_KEY_7002e=f12
   '';
 
+  services.xserver = {
+    enable = true;
+    videoDrivers = [ "amdgpu" ];
+    xkb = {
+      layout = "us";
+      variant = "";
+    };
+  };
+
+  services.desktopManager.gnome.enable = true;
+
+  services.displayManager = {
+    gdm.enable = true;
+    autoLogin.enable = true;
+    autoLogin.user = "sean";
+  };
+
   services.printing = {
     enable = true;
     openFirewall = true;
@@ -130,6 +168,8 @@
   services.samba = {
     enable = true;
     openFirewall = true;
+    winbindd.enable = false;
+    nmbd.enable = true;
     settings = {
       global = {
         "workgroup" = "WORKGROUP";
@@ -157,9 +197,6 @@
     };
   };
 
-  services.samba.winbindd.enable = false;
-  services.samba.nmbd.enable = true;
-
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -169,32 +206,12 @@
     pulse.enable = true;
   };
 
-  users.users.sean = {
-    isNormalUser = true;
-    description = "Sean Treadway";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
-    shell = pkgs.fish;
-  };
-
-  users.users.tm = {
-    isNormalUser = true;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
-  };
-
   programs = {
     firefox.enable = true;
     steam.enable = true;
     fish.enable = true;
     direnv.enable = true;
   };
-
-  nixpkgs.config.allowUnfree = true;
 
   environment.variables = {
     EDITOR = "vim";
@@ -225,20 +242,7 @@
     vlc
   ];
 
-  security.polkit.enable = true;
   services.accounts-daemon.enable = true;
-  security.sudo.extraConfig = ''
-    Defaults timestamp_timeout=240
-    Defaults !tty_tickets
-    Defaults timestamp_type=global
-  '';
-
-  services.fprintd.enable = true;
-  security.pam.services.gdm-fingerprint.fprintAuth = true;
-  security.pam.services.gdm.fprintAuth = true;
-  security.pam.services.sudo.fprintAuth = true;
-
-  services.jellyfin.enable = true;
 
   system.stateVersion = "25.11";
 }
