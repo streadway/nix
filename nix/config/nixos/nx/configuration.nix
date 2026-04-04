@@ -18,6 +18,11 @@
     efi.canTouchEfiVariables = true;
   };
 
+  hardware.openrazer = {
+    enable = true;
+    users = [ "sean" ];
+  };
+
   networking.hostName = "nx";
   networking.networkmanager.enable = true;
 
@@ -27,6 +32,7 @@
     Defaults timestamp_type=global
   '';
   security.polkit.enable = true;
+  security.rtkit.enable = true;
 
   users.users.sean = {
     isNormalUser = true;
@@ -61,6 +67,72 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  environment.variables = {
+    EDITOR = "vim";
+    VISUAL = "vim";
+  };
+
+  environment.systemPackages = with pkgs; [
+    zed-editor
+    git
+    jj
+    vim
+    unzip
+    dig
+    _1password-gui
+    _1password-cli
+    qbittorrent
+
+    lutris
+    wineWow64Packages.staging
+    winetricks
+    discord
+    nil
+    nixd
+    libguestfs
+    qemu-utils
+    amdgpu_top
+    (ffmpeg-full.override { withUnfree = true; })
+    vlc
+  ];
+
+  programs.dconf.enable = true;
+  programs.dconf.profiles.tm.databases = [
+    {
+      settings = {
+        "org/gnome/desktop/interface" = {
+          gtk-theme = "Nordic";
+          color-scheme = "prefer-dark";
+        };
+      };
+    }
+  ];
+
+  programs.dconf.profiles.user.databases = [
+    {
+      settings = {
+        "org/gnome/desktop/interface" = {
+          gtk-theme = "Adwaita";
+          color-scheme = "prefer-dark";
+        };
+        "org/gnome/desktop/peripherals/keyboard" = {
+          delay = "225";
+          repeat-interval = "30";
+          repeat = true;
+        };
+        "org/gnome/desktop/peripherals/mouse" = {
+          natural-scroll = true;
+        };
+        "org/gnome/desktop/screensaver" = {
+          lock-enabled = true;
+        };
+        "org/gnome/desktop/session" = {
+          idle-delay = "1800";
+        };
+      };
+    }
+  ];
+
   programs.nix-ld = {
     enable = true;
     libraries = with pkgs; [
@@ -73,48 +145,13 @@
     binfmt = true;
   };
 
-  programs.dconf = {
-    enable = true;
-    profiles.tm.databases = [
-      {
-        settings = {
-          "org/gnome/desktop/interface" = {
-            gtk-theme = "Nordic";
-            color-scheme = "prefer-dark";
-          };
-        };
-      }
-    ];
-    profiles.user.databases = [
-      {
-        settings = {
-          "org/gnome/desktop/interface" = {
-            gtk-theme = "Adwaita";
-            color-scheme = "prefer-dark";
-          };
-          "org/gnome/desktop/peripherals/keyboard" = {
-            delay = "225";
-            repeat-interval = "30";
-            repeat = true;
-          };
-          "org/gnome/desktop/peripherals/mouse" = {
-            natural-scroll = true;
-          };
-          "org/gnome/desktop/screensaver" = {
-            lock-enabled = true;
-          };
-          "org/gnome/desktop/session" = {
-            idle-delay = "1800";
-          };
-        };
-      }
-    ];
-  };
+  programs.firefox.enable = true;
 
-  hardware.openrazer = {
-    enable = true;
-    users = [ "sean" ];
-  };
+  programs.steam.enable = true;
+
+  programs.fish.enable = true;
+
+  programs.direnv.enable = true;
 
   services.udev.extraHwdb = ''
     # Razer Naga Epic Chroma side keypad (currently /dev/input/event6 on nx)
@@ -198,49 +235,13 @@
   };
 
   services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
+
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
   };
-
-  programs = {
-    firefox.enable = true;
-    steam.enable = true;
-    fish.enable = true;
-    direnv.enable = true;
-  };
-
-  environment.variables = {
-    EDITOR = "vim";
-    VISUAL = "vim";
-  };
-
-  environment.systemPackages = with pkgs; [
-    zed-editor
-    git
-    jj
-    vim
-    unzip
-    dig
-    _1password-gui
-    _1password-cli
-    qbittorrent
-
-    lutris
-    wineWow64Packages.staging
-    winetricks
-    discord
-    nil
-    nixd
-    libguestfs
-    qemu-utils
-    amdgpu_top
-    (ffmpeg-full.override { withUnfree = true; })
-    vlc
-  ];
 
   services.accounts-daemon.enable = true;
 
