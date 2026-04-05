@@ -8,6 +8,7 @@
 {
   # Hardware specific configuration
   imports = with nixos-raspberrypi.nixosModules; [
+    ../../../modules/nixos/nix.nix
     raspberry-pi-5.base
     raspberry-pi-5.page-size-16k
     raspberry-pi-5.display-vc4
@@ -225,38 +226,6 @@
 
   services.samba.nmbd.enable = true;
   services.samba.winbindd.enable = false;
-
-  # Import Blocky dashboard from Grafana.com
-  systemd.services.grafana-import-blocky-dashboard = {
-    wantedBy = [ "multi-user.target" ];
-    wants = [ "network-online.target" ];
-    after = [
-      "grafana.service"
-      "network-online.target"
-    ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      ${pkgs.coreutils}/bin/mkdir -p /var/lib/grafana/dashboards
-      ${pkgs.curl}/bin/curl -o /var/lib/grafana/dashboards/blocky-postgres.json \
-        https://grafana.com/api/dashboards/17996/revisions/latest/download
-      ${pkgs.gnused}/bin/sed -i \
-        's/''${DS_BLOCKY-POSTGRESQL}/blocky-postgresql/g' \
-        /var/lib/grafana/dashboards/blocky-postgres.json
-      ${pkgs.curl}/bin/curl -o /var/lib/grafana/dashboards/blocky-prometheus.json \
-        https://grafana.com/api/dashboards/13768/revisions/latest/download
-      ${pkgs.gnused}/bin/sed -i \
-        -e 's/''${DS_PROMETHEUS}/prometheus/g' \
-        -e 's|''${VAR_BLOCKY_URL}|http://192.168.178.2:4000|g' \
-        -e 's/pod=~\\"\\$pod\\"/instance=~\\"\\$instance\\"/g' \
-        -e 's/label_values(blocky_blocking_enabled,pod)/label_values(blocky_blocking_enabled,instance)/g' \
-        -e '0,/\"name\": \"pod\"/s/\"name\": \"pod\"/\"name\": \"instance\"/' \
-        /var/lib/grafana/dashboards/blocky-prometheus.json
-      ${pkgs.coreutils}/bin/chown -R grafana:grafana /var/lib/grafana/dashboards
-    '';
-  };
 
   # Blocky DNS ad-blocker
   services.blocky = {

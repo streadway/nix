@@ -12,7 +12,6 @@
       download-buffer-size = 524288000; # 500 MiB
 
       trusted-users = [
-        "@admin"
         "@wheel"
       ];
     };
