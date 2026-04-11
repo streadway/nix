@@ -4,12 +4,10 @@
 }:
 {
   nix = {
-    package = pkgs.nix;
+    package = pkgs.lixPackageSets.stable.lix;
 
     settings = {
       experimental-features = "nix-command flakes";
-
-      download-buffer-size = 524288000; # 500 MiB
 
       trusted-users = [
         "@wheel"
