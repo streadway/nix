@@ -18,6 +18,11 @@
     efi.canTouchEfiVariables = true;
   };
 
+  boot.binfmt = {
+    emulatedSystems = [ "aarch64-linux" ];
+    preferStaticEmulators = true;
+  };
+
   hardware.openrazer = {
     enable = true;
     users = [ "sean" ];
