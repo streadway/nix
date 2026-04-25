@@ -9,6 +9,7 @@
   # Hardware specific configuration
   imports = with nixos-raspberrypi.nixosModules; [
     ../../../modules/nixos/nix.nix
+    ../../../modules/nixos/hd-idle.nix
     raspberry-pi-5.base
     raspberry-pi-5.page-size-16k
     raspberry-pi-5.display-vc4
@@ -18,6 +19,8 @@
   networking.hostName = "pi";
   time.timeZone = "Europe/Copenhagen";
   system.stateVersion = "24.05";
+
+  nix.package = lib.mkForce pkgs.nix;
 
   # SSH configuration for remote management
   services.openssh = {
@@ -82,6 +85,22 @@
       "x-systemd.automount"
       "x-systemd.device-timeout=10s"
       "x-systemd.idle-timeout=15min"
+    ];
+  };
+
+  services.hd-idle = {
+    enable = true;
+    args = [
+      "-i"
+      "0"
+      "-c"
+      "scsi"
+      "-s"
+      "1"
+      "-a"
+      "/dev/disk/by-uuid/f4743e05-2236-47c0-bbbc-3aefb16ee327"
+      "-i"
+      "1800"
     ];
   };
 
