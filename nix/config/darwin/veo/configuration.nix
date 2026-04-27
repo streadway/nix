@@ -33,6 +33,30 @@
     pkgs.nerd-fonts.jetbrains-mono
   ];
 
+  nixpkgs.overlays = [
+    (
+      _final: prev:
+      let
+        direnvNoCheck = prev.direnv.overrideAttrs (_: {
+          doCheck = false;
+          doInstallCheck = false;
+        });
+      in
+      {
+        direnv = direnvNoCheck;
+        vimPlugins = prev.vimPlugins // {
+          direnv-vim = prev.vimPlugins.direnv-vim.overrideAttrs (_: {
+            preFixup = ''
+              substituteInPlace $out/autoload/direnv.vim \
+                --replace-fail "let s:direnv_cmd = get(g:, 'direnv_cmd', 'direnv')" \
+                  "let s:direnv_cmd = get(g:, 'direnv_cmd', '${lib.getBin direnvNoCheck}/bin/direnv')"
+            '';
+          });
+        };
+      }
+    )
+  ];
+
   # Enable fish for the system, configure in home-manager
   programs.fish.enable = true;
 

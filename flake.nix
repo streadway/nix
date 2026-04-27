@@ -70,7 +70,8 @@
     };
   };
 
-  outputs = inputs @ {flakelight, ...}:
+  outputs =
+    inputs@{ flakelight, ... }:
     flakelight ./. {
       inherit inputs;
 
@@ -90,12 +91,12 @@
       };
 
       nixDirAliases = {
-        darwinConfigurations = ["config/darwin"];
-        darwinModules = ["modules/darwin"];
-        homeConfigurations = ["config/home-manager"];
-        homeModules = ["modules/home-manager"];
-        nixosConfigurations = ["config/nixos"];
-        nixosModules = ["modules/nixos"];
+        darwinConfigurations = [ "config/darwin" ];
+        darwinModules = [ "modules/darwin" ];
+        homeConfigurations = [ "config/home-manager" ];
+        homeModules = [ "modules/home-manager" ];
+        nixosConfigurations = [ "config/nixos" ];
+        nixosModules = [ "modules/nixos" ];
       };
     };
 }

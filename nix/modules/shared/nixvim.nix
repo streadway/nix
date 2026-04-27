@@ -23,10 +23,15 @@
 
     extraPlugins = [ pkgs.vimPlugins.gruvbox ];
 
+    dependencies.direnv.enable = false;
+
     plugins = {
       lightline.enable = true;
       nix.enable = true;
-      direnv.enable = true;
+      direnv = {
+        enable = true;
+        package = pkgs.vimPlugins.direnv-vim;
+      };
       auto-save.enable = true;
       orgmode.enable = true;
       web-devicons.enable = true;
