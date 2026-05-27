@@ -3,8 +3,7 @@
   config,
   lib,
   ...
-}:
-{
+}: {
   imports = [
     ../../../modules/darwin/homebrew.nix
     ../../../modules/darwin/nixvim.nix
@@ -22,7 +21,7 @@
   };
 
   environment = {
-    shells = [ pkgs.fish ];
+    shells = [pkgs.fish];
     variables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
@@ -35,24 +34,24 @@
 
   nixpkgs.overlays = [
     (
-      _final: prev:
-      let
+      _final: prev: let
         direnvNoCheck = prev.direnv.overrideAttrs (_: {
           doCheck = false;
           doInstallCheck = false;
         });
-      in
-      {
+      in {
         direnv = direnvNoCheck;
-        vimPlugins = prev.vimPlugins // {
-          direnv-vim = prev.vimPlugins.direnv-vim.overrideAttrs (_: {
-            preFixup = ''
-              substituteInPlace $out/autoload/direnv.vim \
-                --replace-fail "let s:direnv_cmd = get(g:, 'direnv_cmd', 'direnv')" \
-                  "let s:direnv_cmd = get(g:, 'direnv_cmd', '${lib.getBin direnvNoCheck}/bin/direnv')"
-            '';
-          });
-        };
+        vimPlugins =
+          prev.vimPlugins
+          // {
+            direnv-vim = prev.vimPlugins.direnv-vim.overrideAttrs (_: {
+              preFixup = ''
+                substituteInPlace $out/autoload/direnv.vim \
+                  --replace-fail "let s:direnv_cmd = get(g:, 'direnv_cmd', 'direnv')" \
+                    "let s:direnv_cmd = get(g:, 'direnv_cmd', '${lib.getBin direnvNoCheck}/bin/direnv')"
+              '';
+            });
+          };
       }
     )
   ];
@@ -127,7 +126,7 @@
         };
       }
     ];
-    extraPlugins = [ ];
+    extraPlugins = [];
     settings = {
       # Disable durability for faster performance
       fsync = false; # Don't force syncs to disk

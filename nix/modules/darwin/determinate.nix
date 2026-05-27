@@ -3,8 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   substituters = [
     "https://nix-community.cachix.org"
     "https://nixos-raspberrypi.cachix.org"
@@ -15,21 +14,22 @@ let
     "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
   ];
 
-  primaryUser = lib.attrByPath [ "system" "primaryUser" ] null config;
-in
-{
+  primaryUser = lib.attrByPath ["system" "primaryUser"] null config;
+in {
   nix.enable = false;
   determinateNix = {
     enable = true;
-    customSettings = {
-      extra-substituters = lib.concatStringsSep " " substituters;
-      extra-trusted-substituters = lib.concatStringsSep " " substituters;
-      extra-trusted-public-keys = lib.concatStringsSep " " trustedPublicKeys;
-    }
-    // lib.optionalAttrs (primaryUser != null) {
-      # Allow the interactive user to opt into flake-provided substituters.
-      "extra-trusted-users" = primaryUser;
-    };
+    determinateNixd.builder.cpuCount = 8;
+    customSettings =
+      {
+        extra-substituters = lib.concatStringsSep " " substituters;
+        extra-trusted-substituters = lib.concatStringsSep " " substituters;
+        extra-trusted-public-keys = lib.concatStringsSep " " trustedPublicKeys;
+      }
+      // lib.optionalAttrs (primaryUser != null) {
+        # Allow the interactive user to opt into flake-provided substituters.
+        "extra-trusted-users" = primaryUser;
+      };
   };
 
   environment.systemPackages = with pkgs; [

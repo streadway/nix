@@ -13,6 +13,8 @@
     viAlias = true;
     vimAlias = true;
 
+    nixpkgs.useGlobalPackages = true;
+
     keymaps = [
     ];
 
