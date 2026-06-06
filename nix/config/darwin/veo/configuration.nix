@@ -7,7 +7,7 @@
   imports = [
     ../../../modules/darwin/homebrew.nix
     ../../../modules/darwin/nixvim.nix
-    ../../../modules/darwin/determinate.nix
+    ../../../modules/darwin/nix.nix
   ];
 
   system = {

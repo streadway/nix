@@ -55,10 +55,6 @@
       url = "github:nvmd/nixos-raspberrypi/main";
     };
 
-    determinate = {
-      url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
-    };
-
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";

@@ -7,7 +7,6 @@
   specialArgs = { inherit inputs; };
 
   modules = [
-    inputs.determinate.darwinModules.default
     inputs.home-manager.darwinModules.home-manager
     inputs.nix-homebrew.darwinModules.nix-homebrew
     inputs.nixvim.nixDarwinModules.nixvim
