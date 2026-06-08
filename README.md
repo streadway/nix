@@ -1,28 +1,16 @@
 # Nix
 
-This repo is organized around `flakelight`. The top-level [flake.nix](/Users/sean/.config/nix/.workspaces/flakelight-reorg/flake.nix) stays small: it declares inputs, imports local flakelight support modules, and lets flakelight discover configurations and modules from `./nix`.
+This repo uses direct flake outputs. The top-level [flake.nix](/Users/sean/.config/home/flake.nix) declares inputs and wires each host to a single `_hosts/<name>/default.nix` module.
 
-## Discovery
+## Hosts
 
-`flake.nix` maps flakelight's outputs onto the repo layout with aliases:
+Each host owns its system configuration and Home Manager configuration in one file:
 
-- `nix/config/darwin` -> `darwinConfigurations`
-- `nix/config/nixos` -> `nixosConfigurations`
-- `nix/config/home-manager` -> `homeConfigurations`
-- `nix/modules/darwin` -> `darwinModules`
-- `nix/modules/nixos` -> `nixosModules`
-- `nix/modules/home-manager` -> `homeModules`
-
-The `nix/modules/flakelight` directory contains local flakelight modules that add Darwin output support in the same style flakelight already provides for NixOS and Home Manager.
-
-## Home Manager Profiles
-
-The old `homes/dev/*` slice is flattened into `nix/modules/home-manager`.
-
-- `base.nix` is the shared user profile.
-- `minimal.nix` imports only `base.nix`.
-- `full.nix` imports `base.nix` plus the actively used development modules.
-- Individual modules like `aws.nix`, `py.nix`, and `rs.nix` remain reusable on their own.
+- `_hosts/veo/default.nix`
+- `_hosts/nx/default.nix`
+- `_hosts/pi/default.nix`
+- `_hosts/ws-srt/default.nix`
+- `_hosts/wsl/default.nix`
 
 ## Commands
 
@@ -33,5 +21,3 @@ Run commands from this directory:
 - `sudo nixos-rebuild switch --flake .#wsl`
 - `sudo nixos-rebuild switch --flake .#pi`
 - `sudo nixos-rebuild switch --flake .#nx`
-- `home-manager switch --flake .#sean-darwin`
-- `home-manager switch --flake .#sean-linux`

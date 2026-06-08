@@ -1,6 +1,0 @@
-{ ... }:
-{
-  imports = [
-    ../shared/nixvim.nix
-  ];
-}
