@@ -5,9 +5,9 @@
   modulesPath,
   pkgs,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkIf
     mkMerge
@@ -46,203 +46,202 @@ let
     fi
   '';
 
-  seanHome =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      home.username = "sean";
-      home.homeDirectory =
-        if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
-      home.stateVersion = "24.05";
+  seanHome = {
+    config,
+    lib,
+    pkgs,
+    ...
+  }: {
+    home.username = "sean";
+    home.homeDirectory =
+      if pkgs.stdenv.isDarwin
+      then "/Users/${config.home.username}"
+      else "/home/${config.home.username}";
+    home.stateVersion = "24.05";
 
-      home.packages = with pkgs; [
-        _1password-cli
-        act
-        bat
-        cacert
-        claude-code
-        cloc
-        difftastic
-        ffmpeg
-        gemini-cli
-        google-cloud-sdk
-        grafana-loki
-        graphviz
-        heroku
-        htop
-        hyperfine
-        inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
-        jjui
-        kubectl
-        kustomize
-        nil
-        nixd
-        nixfmt
-        alejandra
-        nmap
-        nodejs
-        opencode
-        package-version-server
-        plantuml
-        postgresql_17
-        pv
-        ripgrep
-        ruff
-        python3
-        basedpyright
-        slackdump
-        shellcheck
-        ssm-session-manager-plugin
-        terraform
-        tree
-        typescript
-        watch
-        wget
-        xz
-        yq
-        cargo
-        clippy
-        rustc
+    home.packages = with pkgs; [
+      _1password-cli
+      act
+      bat
+      cacert
+      claude-code
+      cloc
+      difftastic
+      ffmpeg
+      gemini-cli
+      google-cloud-sdk
+      grafana-loki
+      graphviz
+      heroku
+      htop
+      hyperfine
+      inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
+      jjui
+      kubectl
+      kustomize
+      nil
+      nixd
+      nixfmt
+      alejandra
+      nmap
+      nodejs
+      opencode
+      package-version-server
+      plantuml
+      postgresql_17
+      pv
+      ripgrep
+      ruff
+      python3
+      basedpyright
+      slackdump
+      shellcheck
+      ssm-session-manager-plugin
+      terraform
+      tree
+      typescript
+      watch
+      wget
+      xz
+      yq
+      cargo
+      clippy
+      rustc
+    ];
+
+    home.file.".ssh/config".text = ''
+      Include ~/.orbstack/ssh/config
+
+      Host *
+        ForwardAgent yes
+        AddKeysToAgent yes
+        IdentityFile ~/.ssh/id_ed25519
+    '';
+
+    home.sessionPath =
+      (lib.optionals pkgs.stdenv.isDarwin [
+        "/opt/homebrew/bin"
+        "/opt/homebrew/sbin"
+      ])
+      ++ [
+        "node_modules/.bin"
+        "~/.local/npm-packages/bin"
+        "~/.local/bin"
+        "~/bin"
+        "~/go/bin"
+        "~/.cargo/bin"
       ];
 
-      home.file.".ssh/config".text = ''
-        Include ~/.orbstack/ssh/config
+    home.sessionVariables = {
+      SHELL = "${pkgs.fish}/bin/fish";
+    };
 
-        Host *
-          ForwardAgent yes
-          AddKeysToAgent yes
-          IdentityFile ~/.ssh/id_ed25519
+    programs.awscli = {
+      enable = true;
+      package = pkgs.awscli.overrideAttrs (_: {
+        doCheck = false;
+      });
+    };
+
+    programs.dircolors.enable = true;
+    programs.fish = {
+      enable = true;
+      plugins = [
+        {
+          name = "tide";
+          src = pkgs.fishPlugins.tide.src;
+        }
+      ];
+      shellAliases = {};
+      shellInit = ''
+        set -g fish_greeting ""
       '';
+    };
+    programs.fzf.enable = true;
+    programs.gh.enable = true;
+    programs.go.enable = true;
+    programs.granted = {
+      enable = true;
+      enableFishIntegration = true;
+    };
+    programs.jq.enable = true;
+    programs.k9s.enable = true;
+    programs.mise = {
+      enable = false;
+      enableFishIntegration = true;
+    };
+    programs.nix-index.enable = true;
+    programs.poetry.enable = true;
+    programs.uv.enable = true;
+    programs.zoxide = {
+      enable = true;
+      enableFishIntegration = true;
+      options = ["--cmd cd"];
+    };
 
-      home.sessionPath =
-        (lib.optionals pkgs.stdenv.isDarwin [
-          "/opt/homebrew/bin"
-          "/opt/homebrew/sbin"
-        ])
-        ++ [
-          "node_modules/.bin"
-          "~/.local/npm-packages/bin"
-          "~/.local/bin"
-          "~/bin"
-          "~/go/bin"
-          "~/.cargo/bin"
-        ];
+    programs.jujutsu = {
+      enable = true;
+      settings = {
+        user = {
+          name = "Sean Treadway";
+          email = "srt@veo.co";
+        };
 
-      home.sessionVariables = {
-        SHELL = "${pkgs.fish}/bin/fish";
-      };
+        ui.merge-editor = "vimdiff";
 
-      programs.awscli = {
-        enable = true;
-        package = pkgs.awscli.overrideAttrs (_: {
-          doCheck = false;
-        });
-      };
-
-      programs.dircolors.enable = true;
-      programs.fish = {
-        enable = true;
-        plugins = [
-          {
-            name = "tide";
-            src = pkgs.fishPlugins.tide.src;
-          }
-        ];
-        shellAliases = { };
-        shellInit = ''
-          set -g fish_greeting ""
-        '';
-      };
-      programs.fzf.enable = true;
-      programs.gh.enable = true;
-      programs.go.enable = true;
-      programs.granted = {
-        enable = true;
-        enableFishIntegration = true;
-      };
-      programs.jq.enable = true;
-      programs.k9s.enable = true;
-      programs.mise = {
-        enable = false;
-        enableFishIntegration = true;
-      };
-      programs.nix-index.enable = true;
-      programs.poetry.enable = true;
-      programs.uv.enable = true;
-      programs.zoxide = {
-        enable = true;
-        enableFishIntegration = true;
-        options = [ "--cmd cd" ];
-      };
-
-      programs.jujutsu = {
-        enable = true;
-        settings = {
-          user = {
-            name = "Sean Treadway";
-            email = "srt@veo.co";
+        fix.tools = {
+          ruffcheck = {
+            command = [
+              "ruff"
+              "check"
+              "--fix"
+              "--stdin-filename=$path"
+              "-"
+            ];
+            patterns = ["glob:'**/*.py'"];
           };
 
-          ui.merge-editor = "vimdiff";
-
-          fix.tools = {
-            ruffcheck = {
-              command = [
-                "ruff"
-                "check"
-                "--fix"
-                "--stdin-filename=$path"
-                "-"
-              ];
-              patterns = [ "glob:'**/*.py'" ];
-            };
-
-            ruffformat = {
-              command = [
-                "ruff"
-                "format"
-                "--stdin-filename=$path"
-                "-"
-              ];
-              patterns = [ "glob:'**/*.py'" ];
-            };
-
-            nixfmt = {
-              command = [
-                "nixfmt"
-                "--verify"
-                "--filename=$path"
-              ];
-              patterns = [ "glob:'**/*.nix'" ];
-            };
+          ruffformat = {
+            command = [
+              "ruff"
+              "format"
+              "--stdin-filename=$path"
+              "-"
+            ];
+            patterns = ["glob:'**/*.py'"];
           };
 
-          aliases.tug = [
-            "bookmark"
-            "move"
-            "--from"
-            "heads(::@- & bookmarks())"
-            "--to"
-            "@-"
-          ];
+          nixfmt = {
+            command = [
+              "nixfmt"
+              "--verify"
+              "--filename=$path"
+            ];
+            patterns = ["glob:'**/*.nix'"];
+          };
         };
-      };
 
-      programs.git = {
-        enable = false;
-        settings = {
-          user.name = "Sean Treadway";
-          user.email = "srt@veo.co";
-          aliases.co = "checkout";
-        };
+        aliases.tug = [
+          "bookmark"
+          "move"
+          "--from"
+          "heads(::@- & bookmarks())"
+          "--to"
+          "@-"
+        ];
       };
     };
-in
-{
+
+    programs.git = {
+      enable = false;
+      settings = {
+        user.name = "Sean Treadway";
+        user.email = "srt@veo.co";
+        aliases.co = "checkout";
+      };
+    };
+  };
+in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
     "${modulesPath}/virtualisation/amazon-image.nix"
@@ -278,7 +277,7 @@ in
 
       systemd.timers.ssh-idle-shutdown = {
         description = "SSH Idle Shutdown Timer";
-        wantedBy = [ "timers.target" ];
+        wantedBy = ["timers.target"];
         timerConfig = {
           OnCalendar = "minutely";
           Persistent = true;
@@ -324,10 +323,10 @@ in
         };
       };
 
-      users.groups.docker = { };
+      users.groups.docker = {};
 
       hardware.graphics.enable = true;
-      services.xserver.videoDrivers = [ "nvidia" ];
+      services.xserver.videoDrivers = ["nvidia"];
 
       hardware.nvidia = {
         modesetting.enable = true;
@@ -372,7 +371,7 @@ in
       programs.nix-ld.enable = true;
 
       home-manager = {
-        extraSpecialArgs = { inherit inputs; };
+        extraSpecialArgs = {inherit inputs;};
         useGlobalPkgs = true;
         useUserPackages = true;
         users.sean = seanHome;

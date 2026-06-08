@@ -5,205 +5,203 @@
   modulesPath,
   pkgs,
   ...
-}:
-let
-  seanHome =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      home.username = "sean";
-      home.homeDirectory =
-        if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
-      home.stateVersion = "24.05";
+}: let
+  seanHome = {
+    config,
+    lib,
+    pkgs,
+    ...
+  }: {
+    home.username = "sean";
+    home.homeDirectory =
+      if pkgs.stdenv.isDarwin
+      then "/Users/${config.home.username}"
+      else "/home/${config.home.username}";
+    home.stateVersion = "24.05";
 
-      home.packages = with pkgs; [
-        _1password-cli
-        act
-        bat
-        cacert
-        claude-code
-        cloc
-        difftastic
-        ffmpeg
-        gemini-cli
-        google-cloud-sdk
-        grafana-loki
-        graphviz
-        heroku
-        htop
-        hyperfine
-        inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
-        jjui
-        kubectl
-        kustomize
-        nil
-        nixd
-        nixfmt
-        alejandra
-        nmap
-        nodejs
-        opencode
-        package-version-server
-        plantuml
-        postgresql_17
-        pv
-        ripgrep
-        ruff
-        python3
-        basedpyright
-        slackdump
-        shellcheck
-        ssm-session-manager-plugin
-        terraform
-        tree
-        typescript
-        watch
-        wget
-        xz
-        yq
-        cargo
-        clippy
-        rustc
+    home.packages = with pkgs; [
+      _1password-cli
+      act
+      bat
+      cacert
+      claude-code
+      cloc
+      difftastic
+      ffmpeg
+      gemini-cli
+      google-cloud-sdk
+      grafana-loki
+      graphviz
+      heroku
+      htop
+      hyperfine
+      inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
+      jjui
+      kubectl
+      kustomize
+      nil
+      nixd
+      nixfmt
+      alejandra
+      nmap
+      nodejs
+      opencode
+      package-version-server
+      plantuml
+      postgresql_17
+      pv
+      ripgrep
+      ruff
+      python3
+      basedpyright
+      slackdump
+      shellcheck
+      ssm-session-manager-plugin
+      terraform
+      tree
+      typescript
+      watch
+      wget
+      xz
+      yq
+      cargo
+      clippy
+      rustc
+    ];
+
+    home.file.".ssh/config".text = ''
+      Include ~/.orbstack/ssh/config
+
+      Host *
+        ForwardAgent yes
+        AddKeysToAgent yes
+        IdentityFile ~/.ssh/id_ed25519
+    '';
+
+    home.sessionPath =
+      (lib.optionals pkgs.stdenv.isDarwin [
+        "/opt/homebrew/bin"
+        "/opt/homebrew/sbin"
+      ])
+      ++ [
+        "node_modules/.bin"
+        "~/.local/npm-packages/bin"
+        "~/.local/bin"
+        "~/bin"
+        "~/go/bin"
+        "~/.cargo/bin"
       ];
 
-      home.file.".ssh/config".text = ''
-        Include ~/.orbstack/ssh/config
+    home.sessionVariables = {
+      SHELL = "${pkgs.fish}/bin/fish";
+    };
 
-        Host *
-          ForwardAgent yes
-          AddKeysToAgent yes
-          IdentityFile ~/.ssh/id_ed25519
+    programs.awscli = {
+      enable = true;
+      package = pkgs.awscli.overrideAttrs (_: {
+        doCheck = false;
+      });
+    };
+
+    programs.dircolors.enable = true;
+    programs.fish = {
+      enable = true;
+      plugins = [
+        {
+          name = "tide";
+          src = pkgs.fishPlugins.tide.src;
+        }
+      ];
+      shellAliases = {};
+      shellInit = ''
+        set -g fish_greeting ""
       '';
+    };
+    programs.fzf.enable = true;
+    programs.gh.enable = true;
+    programs.go.enable = true;
+    programs.granted = {
+      enable = true;
+      enableFishIntegration = true;
+    };
+    programs.jq.enable = true;
+    programs.k9s.enable = true;
+    programs.mise = {
+      enable = false;
+      enableFishIntegration = true;
+    };
+    programs.nix-index.enable = true;
+    programs.poetry.enable = true;
+    programs.uv.enable = true;
+    programs.zoxide = {
+      enable = true;
+      enableFishIntegration = true;
+      options = ["--cmd cd"];
+    };
 
-      home.sessionPath =
-        (lib.optionals pkgs.stdenv.isDarwin [
-          "/opt/homebrew/bin"
-          "/opt/homebrew/sbin"
-        ])
-        ++ [
-          "node_modules/.bin"
-          "~/.local/npm-packages/bin"
-          "~/.local/bin"
-          "~/bin"
-          "~/go/bin"
-          "~/.cargo/bin"
-        ];
+    programs.jujutsu = {
+      enable = true;
+      settings = {
+        user = {
+          name = "Sean Treadway";
+          email = "srt@veo.co";
+        };
 
-      home.sessionVariables = {
-        SHELL = "${pkgs.fish}/bin/fish";
-      };
+        ui.merge-editor = "vimdiff";
 
-      programs.awscli = {
-        enable = true;
-        package = pkgs.awscli.overrideAttrs (_: {
-          doCheck = false;
-        });
-      };
-
-      programs.dircolors.enable = true;
-      programs.fish = {
-        enable = true;
-        plugins = [
-          {
-            name = "tide";
-            src = pkgs.fishPlugins.tide.src;
-          }
-        ];
-        shellAliases = { };
-        shellInit = ''
-          set -g fish_greeting ""
-        '';
-      };
-      programs.fzf.enable = true;
-      programs.gh.enable = true;
-      programs.go.enable = true;
-      programs.granted = {
-        enable = true;
-        enableFishIntegration = true;
-      };
-      programs.jq.enable = true;
-      programs.k9s.enable = true;
-      programs.mise = {
-        enable = false;
-        enableFishIntegration = true;
-      };
-      programs.nix-index.enable = true;
-      programs.poetry.enable = true;
-      programs.uv.enable = true;
-      programs.zoxide = {
-        enable = true;
-        enableFishIntegration = true;
-        options = [ "--cmd cd" ];
-      };
-
-      programs.jujutsu = {
-        enable = true;
-        settings = {
-          user = {
-            name = "Sean Treadway";
-            email = "srt@veo.co";
+        fix.tools = {
+          ruffcheck = {
+            command = [
+              "ruff"
+              "check"
+              "--fix"
+              "--stdin-filename=$path"
+              "-"
+            ];
+            patterns = ["glob:'**/*.py'"];
           };
 
-          ui.merge-editor = "vimdiff";
-
-          fix.tools = {
-            ruffcheck = {
-              command = [
-                "ruff"
-                "check"
-                "--fix"
-                "--stdin-filename=$path"
-                "-"
-              ];
-              patterns = [ "glob:'**/*.py'" ];
-            };
-
-            ruffformat = {
-              command = [
-                "ruff"
-                "format"
-                "--stdin-filename=$path"
-                "-"
-              ];
-              patterns = [ "glob:'**/*.py'" ];
-            };
-
-            nixfmt = {
-              command = [
-                "nixfmt"
-                "--verify"
-                "--filename=$path"
-              ];
-              patterns = [ "glob:'**/*.nix'" ];
-            };
+          ruffformat = {
+            command = [
+              "ruff"
+              "format"
+              "--stdin-filename=$path"
+              "-"
+            ];
+            patterns = ["glob:'**/*.py'"];
           };
 
-          aliases.tug = [
-            "bookmark"
-            "move"
-            "--from"
-            "heads(::@- & bookmarks())"
-            "--to"
-            "@-"
-          ];
+          nixfmt = {
+            command = [
+              "nixfmt"
+              "--verify"
+              "--filename=$path"
+            ];
+            patterns = ["glob:'**/*.nix'"];
+          };
         };
-      };
 
-      programs.git = {
-        enable = false;
-        settings = {
-          user.name = "Sean Treadway";
-          user.email = "srt@veo.co";
-          aliases.co = "checkout";
-        };
+        aliases.tug = [
+          "bookmark"
+          "move"
+          "--from"
+          "heads(::@- & bookmarks())"
+          "--to"
+          "@-"
+        ];
       };
     };
-in
-{
+
+    programs.git = {
+      enable = false;
+      settings = {
+        user.name = "Sean Treadway";
+        user.email = "srt@veo.co";
+        aliases.co = "checkout";
+      };
+    };
+  };
+in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -245,9 +243,9 @@ in
     "usb_storage"
     "sd_mod"
   ];
-  boot.initrd.kernelModules = [ "amdgpu" ];
-  boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [ ];
+  boot.initrd.kernelModules = ["amdgpu"];
+  boot.kernelModules = ["kvm-amd"];
+  boot.extraModulePackages = [];
 
   boot.loader = {
     systemd-boot.enable = true;
@@ -256,7 +254,7 @@ in
   };
 
   boot.binfmt = {
-    emulatedSystems = [ "aarch64-linux" ];
+    emulatedSystems = ["aarch64-linux"];
     preferStaticEmulators = true;
   };
 
@@ -274,7 +272,7 @@ in
     ];
   };
 
-  swapDevices = [ ];
+  swapDevices = [];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
@@ -283,7 +281,7 @@ in
 
   hardware.openrazer = {
     enable = true;
-    users = [ "sean" ];
+    users = ["sean"];
   };
 
   networking = {
@@ -292,8 +290,8 @@ in
     nftables.enable = true;
     useNetworkd = true;
     firewall = {
-      allowedUDPPorts = [ 51820 ];
-      allowedTCPPorts = [ 31369 ];
+      allowedUDPPorts = [51820];
+      allowedTCPPorts = [31369];
       checkReversePath = "loose";
     };
   };
@@ -311,8 +309,8 @@ in
         "fc00:bbbb:bbbb:bb01::4:d65d/128"
         "10.67.214.94/32"
       ];
-      domains = [ "~." ];
-      dns = [ "10.64.0.1" ];
+      domains = ["~."];
+      dns = ["10.64.0.1"];
       networkConfig = {
         DNSDefaultRoute = true;
       };
@@ -430,7 +428,7 @@ in
       libguestfs
       qemu-utils
       amdgpu_top
-      (ffmpeg-full.override { withUnfree = true; })
+      (ffmpeg-full.override {withUnfree = true;})
       vlc
       wireguard-tools
       iproute2
@@ -493,7 +491,7 @@ in
   programs.direnv.enable = true;
 
   home-manager = {
-    extraSpecialArgs = { inherit inputs; };
+    extraSpecialArgs = {inherit inputs;};
     useGlobalPkgs = true;
     useUserPackages = true;
     users.sean = seanHome;
@@ -519,7 +517,7 @@ in
 
   services.xserver = {
     enable = true;
-    videoDrivers = [ "amdgpu" ];
+    videoDrivers = ["amdgpu"];
     xkb = {
       layout = "us";
       variant = "";
