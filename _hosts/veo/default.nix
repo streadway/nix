@@ -4,278 +4,281 @@
   lib,
   pkgs,
   ...
-}: let
-  primaryUser = lib.attrByPath ["system" "primaryUser"] null config;
+}:
+let
+  primaryUser = lib.attrByPath [ "system" "primaryUser" ] null config;
+  linuxBuilderCores = 18;
 
-  seanHome = {
-    config,
-    lib,
-    pkgs,
-    ...
-  }: {
-    home.username = "sean";
-    home.homeDirectory =
-      if pkgs.stdenv.isDarwin
-      then "/Users/${config.home.username}"
-      else "/home/${config.home.username}";
-    home.stateVersion = "24.05";
+  seanHome =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      home.username = "sean";
+      home.homeDirectory =
+        if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
+      home.stateVersion = "24.05";
 
-    home.packages = with pkgs; [
-      _1password-cli
-      act
-      bat
-      cacert
-      claude-code
-      cloc
-      difftastic
-      ffmpeg
-      gemini-cli
-      google-cloud-sdk
-      grafana-loki
-      graphviz
-      heroku
-      htop
-      hyperfine
-      inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
-      jjui
-      kubectl
-      kustomize
-      nil
-      nixd
-      nixfmt
-      alejandra
-      nmap
-      nodejs
-      opencode
-      package-version-server
-      plantuml
-      postgresql_17
-      pv
-      ripgrep
-      ruff
-      python3
-      basedpyright
-      slackdump
-      shellcheck
-      ssm-session-manager-plugin
-      terraform
-      tree
-      typescript
-      watch
-      wget
-      xz
-      yq
-      cargo
-      clippy
-      rustc
-    ];
-
-    home.file.".ssh/config".text = ''
-      Include ~/.orbstack/ssh/config
-
-      Host *
-        ForwardAgent yes
-        AddKeysToAgent yes
-        IdentityFile ~/.ssh/id_ed25519
-    '';
-
-    home.sessionPath =
-      (lib.optionals pkgs.stdenv.isDarwin [
-        "/opt/homebrew/bin"
-        "/opt/homebrew/sbin"
-      ])
-      ++ [
-        "node_modules/.bin"
-        "~/.local/npm-packages/bin"
-        "~/.local/bin"
-        "~/bin"
-        "~/go/bin"
-        "~/.cargo/bin"
-      ];
-
-    home.sessionVariables = {
-      SHELL = "${pkgs.fish}/bin/fish";
-    };
-
-    programs.awscli = {
-      enable = true;
-      package = pkgs.awscli.overrideAttrs (_: {
-        doCheck = false;
-      });
-    };
-
-    programs.dircolors.enable = true;
-    programs.fish = {
-      enable = true;
-      plugins = [
-        {
-          name = "tide";
-          src = pkgs.fishPlugins.tide.src;
-        }
-      ];
-      shellAliases = {};
-      shellInit = ''
-        set -g fish_greeting ""
-      '';
-    };
-    programs.fzf.enable = true;
-    programs.gh.enable = true;
-    programs.go.enable = true;
-    programs.granted = {
-      enable = true;
-      enableFishIntegration = true;
-    };
-    programs.jq.enable = true;
-    programs.k9s.enable = true;
-    programs.neovim = {
-      enable = true;
-      viAlias = true;
-      vimAlias = true;
-      withNodeJs = true;
-      withPython3 = true;
-      withRuby = true;
-      extraPackages = with pkgs; [
+      home.packages = with pkgs; [
+        _1password-cli
+        act
+        bat
+        cacert
+        claude-code
+        cloc
+        difftastic
+        ffmpeg
+        gemini-cli
+        google-cloud-sdk
+        grafana-loki
+        graphviz
+        heroku
+        htop
+        hyperfine
+        inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
+        jjui
+        kubectl
+        kustomize
+        nil
         nixd
-        pyright
+        nixfmt
+        alejandra
+        nmap
+        nodejs
+        opencode
+        package-version-server
+        plantuml
+        postgresql_17
+        pv
         ripgrep
-        fd
+        ruff
+        python3
+        basedpyright
+        slackdump
+        shellcheck
+        ssm-session-manager-plugin
+        terraform
+        tree
+        typescript
+        watch
+        wget
+        xz
+        yq
+        cargo
+        clippy
+        rustc
       ];
-      plugins = with pkgs.vimPlugins; [
-        gruvbox
-        lightline-vim
-        vim-nix
-        direnv-vim
-        auto-save-nvim
-        orgmode
-        nvim-web-devicons
-        nvim-treesitter.withAllGrammars
-        noice-nvim
-        which-key-nvim
-        gitsigns-nvim
-        telescope-nvim
-        telescope-file-browser-nvim
-        nvim-cmp
-        cmp-nvim-lsp
-        cmp-treesitter
-        nvim-lspconfig
-      ];
-      initLua = ''
-        vim.g.mapleader = ","
-        vim.g.maplocalleader = ","
 
-        vim.opt.number = true
-        vim.opt.shiftwidth = 2
-        vim.opt.tabstop = 2
-        vim.opt.expandtab = true
-        vim.opt.autoindent = true
-        vim.opt.smartindent = true
-        vim.opt.smarttab = true
-        vim.opt.cmdheight = 0
+      home.file.".ssh/config".text = ''
+        Include ~/.orbstack/ssh/config
 
-        vim.env.BAT_THEME = "gruvbox"
-
-        vim.cmd("colorscheme gruvbox")
-        require("nvim-web-devicons").setup({})
-        require("cmp").setup({})
-        require("which-key").setup({})
-        require("nvim-treesitter").setup({})
-
-        require("telescope").setup({})
-        require("telescope").load_extension("file_browser")
-
-        require("orgmode").setup({})
-        require("noice").setup({})
-        require("gitsigns").setup({ current_line_blame = true })
-        require("auto-save").setup({})
-
-        vim.keymap.set("n", "<C-p>", "<cmd>Telescope git_files<cr>", { desc = "Telescope Git Files" })
-        vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>")
-        vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<cr>")
-        vim.keymap.set("n", "<leader>fb", "<cmd>Telescope find_buffers<cr>")
-        vim.keymap.set("n", "<leader>fd", "<cmd>Telescope file_browser<cr>")
-
-        vim.lsp.config("nixd", {})
-        vim.lsp.enable("nixd")
-        vim.lsp.config("pyright", {})
-        vim.lsp.enable("pyright")
+        Host *
+          ForwardAgent yes
+          AddKeysToAgent yes
+          IdentityFile ~/.ssh/id_ed25519
       '';
-    };
-    programs.mise = {
-      enable = false;
-      enableFishIntegration = true;
-    };
-    programs.nix-index.enable = true;
-    programs.poetry.enable = true;
-    programs.uv.enable = true;
-    programs.zoxide = {
-      enable = true;
-      enableFishIntegration = true;
-      options = ["--cmd cd"];
-    };
 
-    programs.jujutsu = {
-      enable = true;
-      settings = {
-        user = {
-          name = "Sean Treadway";
-          email = "srt@veo.co";
-        };
-
-        ui.merge-editor = "vimdiff";
-
-        fix.tools = {
-          ruffcheck = {
-            command = [
-              "ruff"
-              "check"
-              "--fix"
-              "--stdin-filename=$path"
-              "-"
-            ];
-            patterns = ["glob:'**/*.py'"];
-          };
-
-          ruffformat = {
-            command = [
-              "ruff"
-              "format"
-              "--stdin-filename=$path"
-              "-"
-            ];
-            patterns = ["glob:'**/*.py'"];
-          };
-
-          nixfmt = {
-            command = [
-              "nixfmt"
-              "--verify"
-              "--filename=$path"
-            ];
-            patterns = ["glob:'**/*.nix'"];
-          };
-        };
-
-        aliases.tug = [
-          "bookmark"
-          "move"
-          "--from"
-          "heads(::@- & bookmarks())"
-          "--to"
-          "@-"
+      home.sessionPath =
+        (lib.optionals pkgs.stdenv.isDarwin [
+          "/opt/homebrew/bin"
+          "/opt/homebrew/sbin"
+        ])
+        ++ [
+          "node_modules/.bin"
+          "~/.local/npm-packages/bin"
+          "~/.local/bin"
+          "~/bin"
+          "~/go/bin"
+          "~/.cargo/bin"
         ];
-      };
-    };
 
-    programs.git = {
-      enable = false;
-      settings = {
-        user.name = "Sean Treadway";
-        user.email = "srt@veo.co";
-        aliases.co = "checkout";
+      home.sessionVariables = {
+        SHELL = "${pkgs.fish}/bin/fish";
+      };
+
+      programs.awscli = {
+        enable = true;
+        package = pkgs.awscli.overrideAttrs (_: {
+          doCheck = false;
+        });
+      };
+
+      programs.dircolors.enable = true;
+      programs.fish = {
+        enable = true;
+        plugins = [
+          {
+            name = "tide";
+            src = pkgs.fishPlugins.tide.src;
+          }
+        ];
+        shellAliases = { };
+        shellInit = ''
+          set -g fish_greeting ""
+        '';
+      };
+      programs.fzf.enable = true;
+      programs.gh.enable = true;
+      programs.go.enable = true;
+      programs.granted = {
+        enable = true;
+        enableFishIntegration = true;
+      };
+      programs.jq.enable = true;
+      programs.k9s.enable = true;
+      programs.neovim = {
+        enable = true;
+        viAlias = true;
+        vimAlias = true;
+        withNodeJs = true;
+        withPython3 = true;
+        withRuby = true;
+        extraPackages = with pkgs; [
+          nixd
+          pyright
+          ripgrep
+          fd
+        ];
+        plugins = with pkgs.vimPlugins; [
+          gruvbox
+          lightline-vim
+          vim-nix
+          direnv-vim
+          auto-save-nvim
+          orgmode
+          nvim-web-devicons
+          nvim-treesitter.withAllGrammars
+          noice-nvim
+          which-key-nvim
+          gitsigns-nvim
+          telescope-nvim
+          telescope-file-browser-nvim
+          nvim-cmp
+          cmp-nvim-lsp
+          cmp-treesitter
+          nvim-lspconfig
+        ];
+        initLua = ''
+          vim.g.mapleader = ","
+          vim.g.maplocalleader = ","
+
+          vim.opt.number = true
+          vim.opt.shiftwidth = 2
+          vim.opt.tabstop = 2
+          vim.opt.expandtab = true
+          vim.opt.autoindent = true
+          vim.opt.smartindent = true
+          vim.opt.smarttab = true
+          vim.opt.cmdheight = 0
+
+          vim.env.BAT_THEME = "gruvbox"
+
+          vim.cmd("colorscheme gruvbox")
+          require("nvim-web-devicons").setup({})
+          require("cmp").setup({})
+          require("which-key").setup({})
+          require("nvim-treesitter").setup({})
+
+          require("telescope").setup({})
+          require("telescope").load_extension("file_browser")
+
+          require("orgmode").setup({})
+          require("noice").setup({})
+          require("gitsigns").setup({ current_line_blame = true })
+          require("auto-save").setup({})
+
+          vim.keymap.set("n", "<C-p>", "<cmd>Telescope git_files<cr>", { desc = "Telescope Git Files" })
+          vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>")
+          vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<cr>")
+          vim.keymap.set("n", "<leader>fb", "<cmd>Telescope find_buffers<cr>")
+          vim.keymap.set("n", "<leader>fd", "<cmd>Telescope file_browser<cr>")
+
+          vim.lsp.config("nixd", {})
+          vim.lsp.enable("nixd")
+          vim.lsp.config("pyright", {})
+          vim.lsp.enable("pyright")
+        '';
+      };
+      programs.mise = {
+        enable = false;
+        enableFishIntegration = true;
+      };
+      programs.nix-index.enable = true;
+      programs.poetry.enable = true;
+      programs.uv.enable = true;
+      programs.zoxide = {
+        enable = true;
+        enableFishIntegration = true;
+        options = [ "--cmd cd" ];
+      };
+
+      programs.jujutsu = {
+        enable = true;
+        settings = {
+          user = {
+            name = "Sean Treadway";
+            email = "srt@veo.co";
+          };
+
+          ui.merge-editor = "vimdiff";
+
+          fix.tools = {
+            ruffcheck = {
+              command = [
+                "ruff"
+                "check"
+                "--fix"
+                "--stdin-filename=$path"
+                "-"
+              ];
+              patterns = [ "glob:'**/*.py'" ];
+            };
+
+            ruffformat = {
+              command = [
+                "ruff"
+                "format"
+                "--stdin-filename=$path"
+                "-"
+              ];
+              patterns = [ "glob:'**/*.py'" ];
+            };
+
+            nixfmt = {
+              command = [
+                "nixfmt"
+                "--verify"
+                "--filename=$path"
+              ];
+              patterns = [ "glob:'**/*.nix'" ];
+            };
+          };
+
+          aliases.tug = [
+            "bookmark"
+            "move"
+            "--from"
+            "heads(::@- & bookmarks())"
+            "--to"
+            "@-"
+          ];
+        };
+      };
+
+      programs.git = {
+        enable = false;
+        settings = {
+          user.name = "Sean Treadway";
+          user.email = "srt@veo.co";
+          aliases.co = "checkout";
+        };
       };
     };
-  };
-in {
+in
+{
   imports = [
     inputs.home-manager.darwinModules.home-manager
     inputs.nix-homebrew.darwinModules.nix-homebrew
@@ -297,7 +300,7 @@ in {
   };
 
   environment = {
-    shells = [pkgs.fish];
+    shells = [ pkgs.fish ];
     systemPackages = with pkgs; [
       vim
     ];
@@ -314,6 +317,18 @@ in {
   nix = {
     enable = true;
     package = pkgs.nix;
+
+    linux-builder = {
+      enable = true;
+      package = pkgs.darwin.linux-builder-x86_64;
+      maxJobs = linuxBuilderCores;
+      systems = [
+        "x86_64-linux"
+      ];
+      config = {
+        virtualisation.cores = linuxBuilderCores;
+      };
+    };
 
     settings = {
       experimental-features = [
@@ -398,24 +413,24 @@ in {
 
   nixpkgs.overlays = [
     (
-      _final: prev: let
+      _final: prev:
+      let
         direnvNoCheck = prev.direnv.overrideAttrs (_: {
           doCheck = false;
           doInstallCheck = false;
         });
-      in {
+      in
+      {
         direnv = direnvNoCheck;
-        vimPlugins =
-          prev.vimPlugins
-          // {
-            direnv-vim = prev.vimPlugins.direnv-vim.overrideAttrs (_: {
-              preFixup = ''
-                substituteInPlace $out/autoload/direnv.vim \
-                  --replace-fail "let s:direnv_cmd = get(g:, 'direnv_cmd', 'direnv')" \
-                    "let s:direnv_cmd = get(g:, 'direnv_cmd', '${lib.getBin direnvNoCheck}/bin/direnv')"
-              '';
-            });
-          };
+        vimPlugins = prev.vimPlugins // {
+          direnv-vim = prev.vimPlugins.direnv-vim.overrideAttrs (_: {
+            preFixup = ''
+              substituteInPlace $out/autoload/direnv.vim \
+                --replace-fail "let s:direnv_cmd = get(g:, 'direnv_cmd', 'direnv')" \
+                  "let s:direnv_cmd = get(g:, 'direnv_cmd', '${lib.getBin direnvNoCheck}/bin/direnv')"
+            '';
+          });
+        };
       }
     )
   ];
@@ -424,7 +439,7 @@ in {
   programs.direnv.enable = true;
 
   home-manager = {
-    extraSpecialArgs = {inherit inputs;};
+    extraSpecialArgs = { inherit inputs; };
     useGlobalPkgs = true;
     useUserPackages = true;
     users.sean = seanHome;
@@ -467,7 +482,7 @@ in {
         };
       }
     ];
-    extraPlugins = [];
+    extraPlugins = [ ];
     settings = {
       fsync = false;
       synchronous_commit = "off";
@@ -482,6 +497,32 @@ in {
     enableKeyMapping = true;
     remapCapsLockToControl = true;
   };
+
+  system.activationScripts.postActivation.text = ''
+    echo "waiting for linux-builder..." >&2
+    launchctl kickstart system/org.nixos.linux-builder >/dev/null 2>&1 || true
+
+    for attempt in $(seq 1 180); do
+      if ${pkgs.openssh}/bin/ssh \
+        -p 31022 \
+        -i /etc/nix/builder_ed25519 \
+        -o BatchMode=yes \
+        -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/dev/null \
+        -o LogLevel=ERROR \
+        builder@localhost true >/dev/null 2>&1; then
+        echo "linux-builder is ready" >&2
+        break
+      fi
+
+      if [ "$attempt" -eq 180 ]; then
+        echo "error: linux-builder did not become reachable after 180 seconds" >&2
+        exit 1
+      fi
+
+      sleep 1
+    done
+  '';
 
   system.defaults = {
     NSGlobalDomain = {
