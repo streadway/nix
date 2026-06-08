@@ -36,16 +36,6 @@
       flake = false;
     };
 
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
     };
@@ -56,57 +46,56 @@
     };
   };
 
-  outputs =
-    inputs@{
-      nixpkgs,
-      nix-darwin,
-      nixos-raspberrypi,
-      ...
-    }:
-    {
-      darwinConfigurations.veo = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
-        specialArgs = { inherit inputs; };
+  outputs = inputs @ {
+    nixpkgs,
+    nix-darwin,
+    nixos-raspberrypi,
+    ...
+  }: let
+    systems = [
+      "aarch64-darwin"
+      "aarch64-linux"
+      "x86_64-linux"
+    ];
+    forAllSystems = nixpkgs.lib.genAttrs systems;
+  in {
+    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+
+    darwinConfigurations.veo = nix-darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
+      specialArgs = {inherit inputs;};
+      modules = [
+        ./_hosts/veo
+      ];
+    };
+
+    nixosConfigurations = {
+      nx = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit inputs;};
         modules = [
-          ./_hosts/veo
+          ./_hosts/nx
         ];
       };
 
-      nixosConfigurations = {
-        nx = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./_hosts/nx
-          ];
+      pi = nixos-raspberrypi.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs;
+          nixos-raspberrypi = inputs.nixos-raspberrypi;
         };
+        modules = [
+          inputs.nixos-raspberrypi.nixosModules.sd-image
+          ./_hosts/pi
+        ];
+      };
 
-        pi = nixos-raspberrypi.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs;
-            nixos-raspberrypi = inputs.nixos-raspberrypi;
-          };
-          modules = [
-            inputs.nixos-raspberrypi.nixosModules.sd-image
-            ./_hosts/pi
-          ];
-        };
-
-        ws-srt = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./_hosts/ws-srt
-          ];
-        };
-
-        wsl = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./_hosts/wsl
-          ];
-        };
+      ws-srt = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit inputs;};
+        modules = [
+          ./_hosts/ws-srt
+        ];
       };
     };
+  };
 }

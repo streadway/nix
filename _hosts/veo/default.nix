@@ -128,6 +128,79 @@ let
       };
       programs.jq.enable = true;
       programs.k9s.enable = true;
+      programs.neovim = {
+        enable = true;
+        viAlias = true;
+        vimAlias = true;
+        withNodeJs = true;
+        withPython3 = true;
+        withRuby = true;
+        extraPackages = with pkgs; [
+          nixd
+          pyright
+          ripgrep
+          fd
+        ];
+        plugins = with pkgs.vimPlugins; [
+          gruvbox
+          lightline-vim
+          vim-nix
+          direnv-vim
+          auto-save-nvim
+          orgmode
+          nvim-web-devicons
+          nvim-treesitter.withAllGrammars
+          noice-nvim
+          which-key-nvim
+          gitsigns-nvim
+          telescope-nvim
+          telescope-file-browser-nvim
+          nvim-cmp
+          cmp-nvim-lsp
+          cmp-treesitter
+          nvim-lspconfig
+        ];
+        initLua = ''
+          vim.g.mapleader = ","
+          vim.g.maplocalleader = ","
+
+          vim.opt.number = true
+          vim.opt.shiftwidth = 2
+          vim.opt.tabstop = 2
+          vim.opt.expandtab = true
+          vim.opt.autoindent = true
+          vim.opt.smartindent = true
+          vim.opt.smarttab = true
+          vim.opt.cmdheight = 0
+
+          vim.env.BAT_THEME = "gruvbox"
+
+          vim.cmd("colorscheme gruvbox")
+          require("nvim-web-devicons").setup({})
+          require("cmp").setup({})
+          require("which-key").setup({})
+          require("nvim-treesitter").setup({})
+
+          require("telescope").setup({})
+          require("telescope").load_extension("file_browser")
+
+          require("orgmode").setup({})
+          require("noice").setup({})
+          require("gitsigns").setup({ current_line_blame = true })
+          require("auto-save").setup({})
+
+          vim.keymap.set("n", "<C-p>", "<cmd>Telescope git_files<cr>", { desc = "Telescope Git Files" })
+          vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>")
+          vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<cr>")
+          vim.keymap.set("n", "<leader>fb", "<cmd>Telescope find_buffers<cr>")
+          vim.keymap.set("n", "<leader>fd", "<cmd>Telescope file_browser<cr>")
+
+          vim.lsp.config("nixd", {})
+          vim.lsp.enable("nixd")
+          vim.lsp.config("pyright", {})
+          vim.lsp.enable("pyright")
+        '';
+      };
       programs.mise = {
         enable = false;
         enableFishIntegration = true;
@@ -204,98 +277,11 @@ let
       };
     };
 
-  nixvimConfig =
-    { pkgs, ... }:
-    {
-      programs.nixvim = {
-        enable = true;
-        enableMan = false;
-        viAlias = true;
-        vimAlias = true;
-
-        nixpkgs.useGlobalPackages = true;
-
-        keymaps = [ ];
-
-        globals = {
-          mapleader = ",";
-          maplocalleader = ",";
-        };
-
-        extraPlugins = [ pkgs.vimPlugins.gruvbox ];
-
-        dependencies.direnv.enable = false;
-
-        plugins = {
-          lightline.enable = true;
-          nix.enable = true;
-          direnv = {
-            enable = true;
-            package = pkgs.vimPlugins.direnv-vim;
-          };
-          auto-save.enable = true;
-          orgmode.enable = true;
-          web-devicons.enable = true;
-          treesitter.enable = true;
-          noice.enable = true;
-          which-key.enable = true;
-          gitsigns = {
-            enable = true;
-            settings.current_line_blame = true;
-          };
-
-          telescope = {
-            enable = true;
-            keymaps = {
-              "<C-p>" = {
-                action = "git_files";
-                options.desc = "Telescope Git Files";
-              };
-              "<leader>ff" = "find_files";
-              "<leader>fg" = "live_grep";
-              "<leader>fb" = "find_buffers";
-              "<leader>fd" = "file_browser";
-            };
-            extensions.file-browser.enable = true;
-          };
-
-          cmp = {
-            enable = true;
-            autoEnableSources = true;
-          };
-          cmp-nvim-lsp.enable = true;
-          cmp-treesitter.enable = true;
-
-          lsp = {
-            enable = true;
-            servers = {
-              pyright.enable = true;
-              nixd.enable = true;
-            };
-          };
-        };
-
-        colorschemes.gruvbox.enable = true;
-
-        opts = {
-          number = true;
-          shiftwidth = 2;
-          tabstop = 2;
-          expandtab = true;
-          autoindent = true;
-          smartindent = true;
-          smarttab = true;
-          cmdheight = 0;
-        };
-      };
-    };
 in
 {
   imports = [
     inputs.home-manager.darwinModules.home-manager
     inputs.nix-homebrew.darwinModules.nix-homebrew
-    inputs.nixvim.nixDarwinModules.nixvim
-    nixvimConfig
   ];
 
   nixpkgs.config = {

@@ -4,9 +4,9 @@
   nixos-raspberrypi,
   pkgs,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     escapeShellArgs
     mkEnableOption
     mkIf
@@ -17,8 +17,7 @@ let
     ;
 
   hdIdleCfg = config.services.hd-idle;
-in
-{
+in {
   imports = with nixos-raspberrypi.nixosModules; [
     raspberry-pi-5.base
     raspberry-pi-5.page-size-16k
@@ -28,11 +27,11 @@ in
   options.services.hd-idle = {
     enable = mkEnableOption "hd-idle disk spindown service";
 
-    package = mkPackageOption pkgs "hd-idle" { };
+    package = mkPackageOption pkgs "hd-idle" {};
 
     args = mkOption {
       type = types.listOf types.str;
-      default = [ ];
+      default = [];
       example = [
         "-i"
         "0"
@@ -60,9 +59,9 @@ in
     (mkIf hdIdleCfg.enable {
       systemd.services.hd-idle = {
         description = "hd-idle disk spindown daemon";
-        after = [ "local-fs.target" ];
-        wants = [ "local-fs.target" ];
-        wantedBy = [ "multi-user.target" ];
+        after = ["local-fs.target"];
+        wants = ["local-fs.target"];
+        wantedBy = ["multi-user.target"];
         serviceConfig = {
           Type = "simple";
           ExecStart = "${lib.getExe hdIdleCfg.package} ${escapeShellArgs hdIdleCfg.args}";
@@ -121,7 +120,7 @@ in
       services.avahi = {
         enable = true;
         nssmdns4 = true;
-        allowInterfaces = [ "end0" ];
+        allowInterfaces = ["end0"];
         publish = {
           enable = true;
           addresses = true;
@@ -181,7 +180,7 @@ in
 
       services.postgresql = {
         enable = true;
-        ensureDatabases = [ "blocky" ];
+        ensureDatabases = ["blocky"];
         ensureUsers = [
           {
             name = "blocky";
@@ -199,8 +198,8 @@ in
       };
 
       systemd.services.postgresql-grant-grafana = {
-        after = [ "postgresql.service" ];
-        wantedBy = [ "multi-user.target" ];
+        after = ["postgresql.service"];
+        wantedBy = ["multi-user.target"];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
@@ -332,10 +331,10 @@ in
 
           blocking = {
             denylists = {
-              ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
+              ads = ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"];
             };
             clientGroupsBlock = {
-              default = [ "ads" ];
+              default = ["ads"];
             };
           };
 
@@ -372,7 +371,7 @@ in
             job_name = "node";
             static_configs = [
               {
-                targets = [ "127.0.0.1:9100" ];
+                targets = ["127.0.0.1:9100"];
               }
             ];
           }
@@ -381,7 +380,7 @@ in
             metrics_path = "/metrics";
             static_configs = [
               {
-                targets = [ "localhost:4000" ];
+                targets = ["localhost:4000"];
               }
             ];
           }
@@ -415,7 +414,7 @@ in
             3000
             3001
           ];
-          allowedUDPPorts = [ 53 ];
+          allowedUDPPorts = [53];
         };
       };
 
@@ -424,7 +423,7 @@ in
         containers = {
           blocky-ui = {
             image = "gabrielduartem/blocky-ui:latest";
-            ports = [ "3000:3000" ];
+            ports = ["3000:3000"];
             environment = {
               BLOCKY_API_URL = "http://127.0.0.1:4000";
             };
