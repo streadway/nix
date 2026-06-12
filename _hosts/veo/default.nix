@@ -6,7 +6,6 @@
   ...
 }: let
   primaryUser = lib.attrByPath ["system" "primaryUser"] null config;
-  linuxBuilderCores = 18;
 
   seanHome = {
     config,
@@ -55,6 +54,7 @@
       pv
       ripgrep
       ruff
+      runit
       python3
       basedpyright
       slackdump
@@ -319,17 +319,30 @@ in {
 
     linux-builder = {
       enable = true;
-      package = pkgs.darwin.linux-builder-x86_64;
-      maxJobs = linuxBuilderCores;
-      systems = [
-        "x86_64-linux"
-      ];
+      ephemeral = true;
+      maxJobs = 16;
       config = {
-        virtualisation.cores = linuxBuilderCores;
+        nix.settings.sandbox = false;
+        virtualisation = {
+          darwin-builder = {
+            diskSize = 40 * 1024;
+            memorySize = 8 * 1024;
+          };
+          cores = 12;
+        };
       };
+      # systems = [
+      #   "x86_64-linux"
+      #   "aarch64-linux"
+      # ];
     };
 
     settings = {
+      system-features = [
+        "nixos-test"
+        "apple-virt"
+      ];
+
       experimental-features = [
         "nix-command"
         "flakes"
@@ -346,6 +359,7 @@ in {
       trusted-users = lib.mkForce (
         [
           "root"
+          "@admin"
         ]
         ++ lib.optionals (primaryUser != null) [
           primaryUser
@@ -496,32 +510,6 @@ in {
     enableKeyMapping = true;
     remapCapsLockToControl = true;
   };
-
-  system.activationScripts.postActivation.text = ''
-    echo "waiting for linux-builder..." >&2
-    launchctl kickstart system/org.nixos.linux-builder >/dev/null 2>&1 || true
-
-    for attempt in $(seq 1 180); do
-      if ${pkgs.openssh}/bin/ssh \
-        -p 31022 \
-        -i /etc/nix/builder_ed25519 \
-        -o BatchMode=yes \
-        -o StrictHostKeyChecking=no \
-        -o UserKnownHostsFile=/dev/null \
-        -o LogLevel=ERROR \
-        builder@localhost true >/dev/null 2>&1; then
-        echo "linux-builder is ready" >&2
-        break
-      fi
-
-      if [ "$attempt" -eq 180 ]; then
-        echo "error: linux-builder did not become reachable after 180 seconds" >&2
-        exit 1
-      fi
-
-      sleep 1
-    done
-  '';
 
   system.defaults = {
     NSGlobalDomain = {
