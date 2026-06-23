@@ -17,6 +17,10 @@
       url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     };
 
+    nixpkgs-26 = {
+      url = "github:NixOS/nixpkgs/nixos-26.05";
+    };
+
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";

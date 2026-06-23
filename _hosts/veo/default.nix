@@ -50,7 +50,7 @@
       opencode
       package-version-server
       plantuml
-      postgresql_17
+      postgresql_18
       pv
       ripgrep
       ruff
@@ -320,21 +320,22 @@ in {
     linux-builder = {
       enable = true;
       ephemeral = true;
-      maxJobs = 16;
+      # Remove this pin once nixpkgs-unstable includes a QEMU fix for:
+      # - https://github.com/NixOS/nixpkgs/issues/528299
+      # - https://github.com/NixOS/nixpkgs/issues/532038
+      package = inputs.nixpkgs-26.legacyPackages.${pkgs.stdenv.hostPlatform.system}.darwin.linux-builder;
+
       config = {
-        nix.settings.sandbox = false;
         virtualisation = {
-          darwin-builder = {
-            diskSize = 40 * 1024;
-            memorySize = 8 * 1024;
-          };
-          cores = 12;
+          darwin-builder.memorySize = 8192;
+          cores = 8;
+        };
+
+        nix.settings = {
+          substituters = lib.mkForce (config.nix.settings.substituters ++ config.nix.settings.extra-substituters);
+          trusted-public-keys = lib.mkForce (config.nix.settings.trusted-public-keys ++ config.nix.settings.extra-trusted-public-keys);
         };
       };
-      # systems = [
-      #   "x86_64-linux"
-      #   "aarch64-linux"
-      # ];
     };
 
     settings = {
