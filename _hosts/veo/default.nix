@@ -426,6 +426,7 @@ in {
   };
 
   nixpkgs.overlays = [
+    inputs.claude-code-nix.overlays.default
     (
       _final: prev: let
         direnvNoCheck = prev.direnv.overrideAttrs (_: {
