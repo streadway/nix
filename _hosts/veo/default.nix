@@ -422,6 +422,7 @@ in {
       "orbstack"
       "eul"
       "ghostty"
+      "superwhisper"
     ];
   };
 
