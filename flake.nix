@@ -40,6 +40,11 @@
       flake = false;
     };
 
+    unramble-tap = {
+      url = "github:mrinalwadhwa/homebrew-unramble";
+      flake = false;
+    };
+
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
     };

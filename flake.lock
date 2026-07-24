@@ -290,7 +290,8 @@
         "nixos-raspberrypi": "nixos-raspberrypi",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-26": "nixpkgs-26",
-        "schpet-tap": "schpet-tap"
+        "schpet-tap": "schpet-tap",
+        "unramble-tap": "unramble-tap"
       }
     },
     "schpet-tap": {
@@ -336,6 +337,22 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "unramble-tap": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784786887,
+        "narHash": "sha256-iveA5KmzAxiZp5lO5dWaPZV0msN3xe0HaQ27t1VkEFA=",
+        "owner": "mrinalwadhwa",
+        "repo": "homebrew-unramble",
+        "rev": "f5ce3c6cf58d73b8a6349164c37698631c20f137",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mrinalwadhwa",
+        "repo": "homebrew-unramble",
         "type": "github"
       }
     }

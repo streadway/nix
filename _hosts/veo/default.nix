@@ -396,6 +396,7 @@ in {
     autoMigrate = true;
     taps = {
       "schpet/homebrew-tap" = inputs.schpet-tap;
+      "mrinalwadhwa/homebrew-unramble" = inputs.unramble-tap;
     };
     mutableTaps = false;
   };
@@ -422,7 +423,7 @@ in {
       "orbstack"
       "eul"
       "ghostty"
-      "superwhisper"
+      "mrinalwadhwa/unramble/unramble"
     ];
   };
 
