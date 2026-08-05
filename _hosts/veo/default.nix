@@ -318,7 +318,7 @@ in {
     package = pkgs.nix;
 
     linux-builder = {
-      enable = true;
+      enable = false;
       ephemeral = true;
       # Remove this pin once nixpkgs-unstable includes a QEMU fix for:
       # - https://github.com/NixOS/nixpkgs/issues/528299
