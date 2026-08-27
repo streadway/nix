@@ -54,7 +54,7 @@
   }: {
     home.username = "sean";
     home.homeDirectory =
-      if pkgs.stdenv.isDarwin
+      if pkgs.stdenv.hostPlatform.isDarwin
       then "/Users/${config.home.username}"
       else "/home/${config.home.username}";
     home.stateVersion = "24.05";
@@ -119,7 +119,7 @@
     '';
 
     home.sessionPath =
-      (lib.optionals pkgs.stdenv.isDarwin [
+      (lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
         "/opt/homebrew/bin"
         "/opt/homebrew/sbin"
       ])
