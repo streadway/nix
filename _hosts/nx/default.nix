@@ -28,7 +28,6 @@
       cloc
       difftastic
       ffmpeg
-      gemini-cli
       google-cloud-sdk
       grafana-loki
       graphviz
@@ -36,6 +35,7 @@
       htop
       hyperfine
       inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
       jjui
       kubectl
       kustomize

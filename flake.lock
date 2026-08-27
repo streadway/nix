@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "antigravity-cli-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1787814299,
+        "narHash": "sha256-hXN/VmssNhU3lrMbUswJqoG6vjGtFUFMcYha5cmeZ4c=",
+        "owner": "xsen",
+        "repo": "antigravity-cli-nix",
+        "rev": "7d2738899f150a50da48a2d6b260003b12cc1e8b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "xsen",
+        "repo": "antigravity-cli-nix",
+        "type": "github"
+      }
+    },
     "argononed": {
       "flake": false,
       "locked": {
@@ -264,6 +284,7 @@
     },
     "root": {
       "inputs": {
+        "antigravity-cli-nix": "antigravity-cli-nix",
         "claude-code-nix": "claude-code-nix",
         "codex-cli-nix": "codex-cli-nix",
         "home-manager": "home-manager",
