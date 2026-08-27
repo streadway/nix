@@ -261,7 +261,7 @@ in {
     (mkIf sshIdleShutdownCfg.enable {
       assertions = [
         {
-          assertion = pkgs.stdenv.isLinux;
+          assertion = pkgs.stdenv.hostPlatform.isLinux;
           message = "ssh-idle-shutdown service requires a Linux system with systemd (NixOS)";
         }
       ];
