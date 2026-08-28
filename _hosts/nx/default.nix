@@ -375,6 +375,8 @@ in {
     extraGroups = [
       "networkmanager"
       "wheel"
+      "input"
+      "uinput"
     ];
     shell = pkgs.fish;
   };
@@ -423,6 +425,7 @@ in {
       wineWow64Packages.staging
       winetricks
       discord
+      vesktop
       nil
       nixd
       libguestfs
@@ -456,8 +459,8 @@ in {
           color-scheme = "prefer-dark";
         };
         "org/gnome/desktop/peripherals/keyboard" = {
-          delay = "225";
-          repeat-interval = "30";
+          delay = lib.gvariant.mkUint32 225;
+          repeat-interval = lib.gvariant.mkUint32 30;
           repeat = true;
         };
         "org/gnome/desktop/peripherals/mouse" = {
@@ -467,7 +470,7 @@ in {
           lock-enabled = true;
         };
         "org/gnome/desktop/session" = {
-          idle-delay = "1800";
+          idle-delay = lib.gvariant.mkUint32 1800;
         };
       };
     }
@@ -487,6 +490,7 @@ in {
 
   programs.firefox.enable = true;
   programs.steam.enable = true;
+  programs.gamemode.enable = true;
   programs.fish.enable = true;
   programs.direnv.enable = true;
 
@@ -524,13 +528,10 @@ in {
     };
   };
 
-  services.desktopManager.gnome.enable = true;
+  services.input-remapper.enable = true;
 
-  services.displayManager = {
-    gdm.enable = true;
-    autoLogin.enable = true;
-    autoLogin.user = "sean";
-  };
+  services.desktopManager.gnome.enable = true;
+  services.displayManager.gdm.enable = true;
 
   services.printing = {
     enable = true;
