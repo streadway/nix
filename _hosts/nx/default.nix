@@ -205,6 +205,7 @@ in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
     (modulesPath + "/installer/scan/not-detected.nix")
+    ../../_modules/wayland-push-to-talk-fix
   ];
 
   nixpkgs.config = {
@@ -529,6 +530,13 @@ in {
   };
 
   services.input-remapper.enable = true;
+
+  services.wayland-push-to-talk-fix = {
+    enable = false;
+    device = "/dev/input/by-id/usb-Razer_Razer_Naga_Epic_Chroma-event-mouse";
+    keyCode = "BTN_SIDE";
+    keyName = "MOUSE8";
+  };
 
   services.desktopManager.gnome.enable = true;
   services.displayManager.gdm.enable = true;

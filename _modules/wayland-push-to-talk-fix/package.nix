@@ -5,6 +5,7 @@
   pkg-config,
   libevdev,
   xdotool,
+  libx11,
 }:
 stdenv.mkDerivation rec {
   pname = "wayland-push-to-talk-fix";
@@ -24,6 +25,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     libevdev
     xdotool
+    libx11
   ];
 
   installPhase = ''
