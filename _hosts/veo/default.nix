@@ -39,6 +39,9 @@
       hyperfine
       inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
       jjui
+      git-lfs
+      ty
+      pyrefly
       kubectl
       kustomize
       nil
