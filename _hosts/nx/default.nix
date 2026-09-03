@@ -35,7 +35,9 @@
       htop
       hyperfine
       inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-no-fhs
+      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
+      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-ide-no-fhs
       jjui
       kubectl
       kustomize

@@ -60,7 +60,7 @@
     };
 
     antigravity-cli-nix = {
-      url = "github:xsen/antigravity-cli-nix";
+      url = "github:jacopone/antigravity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
