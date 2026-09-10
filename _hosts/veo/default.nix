@@ -30,7 +30,6 @@
       dbeaver-bin
       difftastic
       ffmpeg
-      gemini-cli
       google-cloud-sdk
       grafana-loki
       graphviz
@@ -41,6 +40,7 @@
       jjui
       git-lfs
       ty
+      marp-cli
       pyrefly
       kubectl
       kustomize
