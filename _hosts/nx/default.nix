@@ -246,7 +246,9 @@ in {
     "usb_storage"
     "sd_mod"
   ];
-  boot.initrd.kernelModules = ["amdgpu"];
+  # Removed "amdgpu" for maximum compatibility after replacing the RX 5700 XT with the RTX 5070.
+  # The NVIDIA kernel modules are loaded by NixOS after stage 1 boot.
+  boot.initrd.kernelModules = [];
   boot.kernelModules = ["kvm-amd"];
   boot.extraModulePackages = [];
 
@@ -280,7 +282,34 @@ in {
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   hardware.graphics.enable = true;
-  hardware.graphics.enable32Bit = true;
+  hardware.graphics.enable32Bit = true; # Required for 32-bit acceleration (Steam, Wine/Proton games)
+
+  # NVIDIA GeForce RTX 5070 OC Configuration
+  hardware.nvidia = {
+    # Modesetting is mandatory for Wayland compositors (GNOME Wayland/GDM) and KMS display output.
+    modesetting.enable = true;
+
+    # Experimental systemd power management: keep false for maximum stability and compatibility.
+    # When enabled, the driver saves VRAM state to /tmp across suspend/resume, which can exhaust
+    # memory on systems with tmpfs or cause resume black screens.
+    powerManagement.enable = false;
+    powerManagement.finegrained = false;
+
+    # Open source kernel module (nvidia-open):
+    # Required for NVIDIA Blackwell architecture (RTX 50-series) and driver >= 560.
+    open = true;
+
+    # Enable the nvidia-settings GUI utility to inspect GPU clocks, temperatures, and driver state.
+    nvidiaSettings = true;
+
+    # Performance / Power tuning options (commented out for maximum initial compatibility):
+    # Uncomment to enable nvidia-persistenced daemon (keeps GPU awake, useful for compute/CUDA workloads):
+    # nvidiaPersistenced = true;
+
+    # Uncomment if experiencing screen tearing under X11 (forces full composition pipeline,
+    # but may increase power consumption and reduce performance in some OpenGL/WebGL apps):
+    # forceFullCompositionPipeline = true;
+  };
 
   hardware.openrazer = {
     enable = true;
@@ -413,6 +442,26 @@ in {
       VISUAL = "vim";
     };
 
+    # Performance & acceleration environment variables:
+    # Disabled (commented out) by default for maximum compatibility on the next boot.
+    # Uncomment individual variables to opt into specific acceleration improvements:
+    sessionVariables = {
+      # --- Hardware Video Acceleration (VA-API via NVDEC) ---
+      # Directs libva to load the nvidia-vaapi-driver for hardware video decoding (Firefox, VLC, ffmpeg):
+      # LIBVA_DRIVER_NAME = "nvidia";
+
+      # Forces the direct NVDEC backend instead of the legacy EGL backend in nvidia-vaapi-driver:
+      # NVD_BACKEND = "direct";
+
+      # Relaxes Firefox's RDD process sandbox so it can access the NVIDIA driver for hardware decoding:
+      # MOZ_DISABLE_RDD_SANDBOX = "1";
+
+      # --- Wayland Native Acceleration for Electron/Chromium ---
+      # Forces Electron and Chromium apps (Discord, Vesktop, 1Password, Zed) to run natively on Wayland.
+      # Disabled initially so apps run through XWayland for maximum compatibility:
+      # NIXOS_OZONE_WL = "1";
+    };
+
     systemPackages = with pkgs; [
       zed-editor
       git
@@ -433,7 +482,12 @@ in {
       nixd
       libguestfs
       qemu-utils
-      amdgpu_top
+
+      # GPU diagnostics and monitoring:
+      nvtopPackages.full # GPU process monitor (similar to htop/amdgpu_top, supports NVIDIA)
+      vulkan-tools # Provides vulkaninfo CLI to verify Vulkan driver & acceleration
+      libva-utils # Provides vainfo CLI to verify VA-API video decode capabilities
+
       (ffmpeg-full.override {withUnfree = true;})
       vlc
       wireguard-tools
@@ -491,7 +545,18 @@ in {
     binfmt = true;
   };
 
-  programs.firefox.enable = true;
+  programs.firefox = {
+    enable = true;
+    # Performance-related video decoding optimizations for Firefox:
+    # Disabled (commented out) initially for maximum stability & compatibility (Firefox defaults to its
+    # standard software/safe media pipeline).
+    # Uncomment after verifying initial boot to force hardware-accelerated video playback via VA-API/NVDEC:
+    # preferences = {
+    #   "media.ffmpeg.vaapi.enabled" = true;
+    #   "media.hardware-video-decoding.force-enabled" = true;
+    #   "widget.dmabuf.force-enabled" = true;
+    # };
+  };
   programs.steam.enable = true;
   programs.gamemode.enable = true;
   programs.fish.enable = true;
@@ -524,7 +589,8 @@ in {
 
   services.xserver = {
     enable = true;
-    videoDrivers = ["amdgpu"];
+    # Load the NVIDIA driver for display outputs and X11/Wayland/GDM:
+    videoDrivers = ["nvidia"];
     xkb = {
       layout = "us";
       variant = "";
