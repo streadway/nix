@@ -289,10 +289,9 @@ in {
     # Modesetting is mandatory for Wayland compositors (GNOME Wayland/GDM) and KMS display output.
     modesetting.enable = true;
 
-    # Experimental systemd power management: keep false for maximum stability and compatibility.
     # When enabled, the driver saves VRAM state to /tmp across suspend/resume, which can exhaust
     # memory on systems with tmpfs or cause resume black screens.
-    powerManagement.enable = false;
+    powerManagement.enable = true;
     powerManagement.finegrained = false;
 
     # Open source kernel module (nvidia-open):
@@ -315,6 +314,14 @@ in {
     enable = true;
     users = ["sean"];
   };
+
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
+
+  hardware.xpadneo.enable = true;
+  hardware.steam-hardware.enable = true;
 
   networking = {
     hostName = "nx";
