@@ -27,7 +27,6 @@
       claude-code
       cloc
       difftastic
-      ffmpeg
       google-cloud-sdk
       grafana-loki
       graphviz
@@ -35,9 +34,6 @@
       htop
       hyperfine
       inputs.codex-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-no-fhs
-      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
-      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-ide-no-fhs
       jjui
       kubectl
       kustomize
@@ -251,6 +247,7 @@ in {
   boot.initrd.kernelModules = [];
   boot.kernelModules = ["kvm-amd"];
   boot.extraModulePackages = [];
+  boot.supportedFilesystems = ["ntfs"];
 
   boot.loader = {
     systemd-boot.enable = true;
@@ -277,7 +274,12 @@ in {
     ];
   };
 
-  swapDevices = [];
+  swapDevices = [
+    {
+      device = "/var/lib/swapfile";
+      size = 16 * 1024;
+    }
+  ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
@@ -453,20 +455,25 @@ in {
     # Disabled (commented out) by default for maximum compatibility on the next boot.
     # Uncomment individual variables to opt into specific acceleration improvements:
     sessionVariables = {
+      GDK_GL = "gles";
       # --- Hardware Video Acceleration (VA-API via NVDEC) ---
       # Directs libva to load the nvidia-vaapi-driver for hardware video decoding (Firefox, VLC, ffmpeg):
-      # LIBVA_DRIVER_NAME = "nvidia";
+      LIBVA_DRIVER_NAME = "nvidia";
 
       # Forces the direct NVDEC backend instead of the legacy EGL backend in nvidia-vaapi-driver:
-      # NVD_BACKEND = "direct";
+      NVD_BACKEND = "direct";
 
       # Relaxes Firefox's RDD process sandbox so it can access the NVIDIA driver for hardware decoding:
-      # MOZ_DISABLE_RDD_SANDBOX = "1";
+      MOZ_DISABLE_RDD_SANDBOX = "1";
 
       # --- Wayland Native Acceleration for Electron/Chromium ---
       # Forces Electron and Chromium apps (Discord, Vesktop, 1Password, Zed) to run natively on Wayland.
       # Disabled initially so apps run through XWayland for maximum compatibility:
-      # NIXOS_OZONE_WL = "1";
+      NIXOS_OZONE_WL = "1";
+
+      SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
+      NIX_SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
+      REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-bundle.crt";
     };
 
     systemPackages = with pkgs; [
@@ -489,6 +496,7 @@ in {
       nixd
       libguestfs
       qemu-utils
+      gearlever
 
       # GPU diagnostics and monitoring:
       nvtopPackages.full # GPU process monitor (similar to htop/amdgpu_top, supports NVIDIA)
@@ -500,6 +508,15 @@ in {
       wireguard-tools
       iproute2
       nftables
+
+      stable-diffusion-cpp-cuda
+
+      gnome-extension-manager
+      gnomeExtensions.quick-settings-audio-panel
+
+      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-no-fhs
+      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
+      inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-ide-no-fhs
     ];
   };
 
@@ -544,6 +561,9 @@ in {
     enable = true;
     libraries = with pkgs; [
       libcap
+      stdenv.cc.cc.lib
+      zlib
+      config.hardware.nvidia.package
     ];
   };
 
