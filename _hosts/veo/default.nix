@@ -465,6 +465,8 @@ in {
     users.sean = seanHome;
   };
 
+  services.tailscale.enable = true;
+
   services.redis.enable = true;
 
   services.postgresql = {
