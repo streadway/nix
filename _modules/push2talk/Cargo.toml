@@ -1,0 +1,8 @@
+[package]
+name = "push2talk"
+version = "0.1.0"
+edition = "2021"
+description = "Wayland/PipeWire push-to-talk daemon listening on Linux evdev"
+license = "MIT"
+
+[dependencies]

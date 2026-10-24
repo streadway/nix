@@ -203,7 +203,8 @@ in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
     (modulesPath + "/installer/scan/not-detected.nix")
-    ../../_modules/wayland-push-to-talk-fix
+    ../../_modules/nothing-to-say
+    ../../_modules/push2talk
   ];
 
   nixpkgs.config = {
@@ -496,8 +497,7 @@ in {
       qemu-utils
       gearlever
 
-      discord-canary
-      vesktop
+      discord
 
       # GPU diagnostics and monitoring:
       nvtopPackages.full # GPU process monitor (similar to htop/amdgpu_top, supports NVIDIA)
@@ -512,7 +512,6 @@ in {
 
       gnome-extension-manager
       gnomeExtensions.quick-settings-audio-panel
-      gnomeExtensions.nothing-to-say
 
       inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-no-fhs
       inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
@@ -552,6 +551,16 @@ in {
         };
         "org/gnome/desktop/session" = {
           idle-delay = lib.gvariant.mkUint32 1800;
+        };
+        "org/gnome/shell" = {
+          disable-user-extensions = false;
+          enabled-extensions = [
+            pkgs.gnomeExtensions.nothing-to-say.extensionUuid
+            pkgs.gnomeExtensions.quick-settings-audio-panel.extensionUuid
+          ];
+        };
+        "org/gnome/shell/extensions/nothing-to-say" = {
+          icon-visibility = "always";
         };
       };
     }
@@ -634,11 +643,10 @@ in {
 
   services.input-remapper.enable = true;
 
-  services.wayland-push-to-talk-fix = {
-    enable = false;
+  services.push2talk = {
+    enable = true;
     device = "/dev/input/by-id/usb-Razer_Razer_Naga_Epic_Chroma-event-mouse";
     keyCode = "BTN_EXTRA";
-    keyName = "MOUSE8";
   };
 
   services.desktopManager.gnome.enable = true;
