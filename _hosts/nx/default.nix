@@ -490,29 +490,29 @@ in {
       lutris
       wineWow64Packages.staging
       winetricks
-      discord
-      vesktop
       nil
       nixd
       libguestfs
       qemu-utils
       gearlever
 
+      discord-canary
+      vesktop
+
       # GPU diagnostics and monitoring:
       nvtopPackages.full # GPU process monitor (similar to htop/amdgpu_top, supports NVIDIA)
       vulkan-tools # Provides vulkaninfo CLI to verify Vulkan driver & acceleration
       libva-utils # Provides vainfo CLI to verify VA-API video decode capabilities
 
-      (ffmpeg-full.override {withUnfree = true;})
+      ffmpeg-full
       vlc
       wireguard-tools
       iproute2
       nftables
 
-      stable-diffusion-cpp-cuda
-
       gnome-extension-manager
       gnomeExtensions.quick-settings-audio-panel
+      gnomeExtensions.nothing-to-say
 
       inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-no-fhs
       inputs.antigravity-cli-nix.packages.${pkgs.stdenv.hostPlatform.system}.google-antigravity-cli
@@ -614,6 +614,14 @@ in {
       KEYBOARD_KEY_7002e=f12
   '';
 
+  # Enable XDG Desktop Portals
+  xdg.portal = {
+    enable = true;
+    # GNOME sets up xdg-desktop-portal-gnome automatically,
+    # but declaring it ensures the portal listener is active
+    extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
+  };
+
   services.xserver = {
     enable = true;
     # Load the NVIDIA driver for display outputs and X11/Wayland/GDM:
@@ -629,7 +637,7 @@ in {
   services.wayland-push-to-talk-fix = {
     enable = false;
     device = "/dev/input/by-id/usb-Razer_Razer_Naga_Epic_Chroma-event-mouse";
-    keyCode = "BTN_SIDE";
+    keyCode = "BTN_EXTRA";
     keyName = "MOUSE8";
   };
 
