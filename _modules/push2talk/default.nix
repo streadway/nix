@@ -42,8 +42,9 @@ in {
     };
 
     device = mkOption {
-      type = types.str;
-      description = "Path to the Linux evdev input device to watch.";
+      type = types.nullOr types.str;
+      default = null;
+      description = "Path to the Linux evdev input device to watch, or null/\"all\" to watch all mice/matching devices.";
     };
 
     keyCode = mkOption {
@@ -69,10 +70,21 @@ in {
         "graphical-session.target"
         "wireplumber.service"
       ];
+      unitConfig = {
+        ConditionGroup = "input";
+      };
       serviceConfig = {
-        ExecStart = "${getExe cfg.package} ${escapeShellArgs [cfg.device cfg.keyCode cfg.source]}";
-        ExecStartPost = "${pkgs.wireplumber}/bin/wpctl set-mute ${escapeShellArg cfg.source} 1";
-        ExecStopPost = "${pkgs.wireplumber}/bin/wpctl set-mute ${escapeShellArg cfg.source} 1";
+        ExecStart = "${getExe cfg.package} ${escapeShellArgs [
+          (
+            if cfg.device == null
+            then "all"
+            else cfg.device
+          )
+          cfg.keyCode
+          cfg.source
+        ]}";
+        ExecStartPost = "-${pkgs.wireplumber}/bin/wpctl set-mute ${escapeShellArg cfg.source} 1";
+        ExecStopPost = "-${pkgs.wireplumber}/bin/wpctl set-mute ${escapeShellArg cfg.source} 1";
         Restart = "always";
         RestartSec = "2";
       };

@@ -215,7 +215,10 @@ in {
   nix = {
     package = pkgs.lixPackageSets.stable.lix;
     settings = {
-      experimental-features = ["nix-command" "flakes"];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       trusted-users = [
         "@wheel"
       ];
@@ -246,7 +249,12 @@ in {
   # Removed "amdgpu" for maximum compatibility after replacing the RX 5700 XT with the RTX 5070.
   # The NVIDIA kernel modules are loaded by NixOS after stage 1 boot.
   boot.initrd.kernelModules = [];
-  boot.kernelModules = ["kvm-amd"];
+  boot.kernelModules = [
+    "kvm-amd"
+    "vfio_pci"
+    "vfio"
+    "vfio_iommu_type1"
+  ];
   boot.extraModulePackages = [];
   boot.supportedFilesystems = ["ntfs"];
 
@@ -273,6 +281,12 @@ in {
       "fmask=0077"
       "dmask=0077"
     ];
+  };
+
+  fileSystems."/home/tm" = {
+    device = "/dev/disk/by-uuid/e2bb19c7-39c2-4c2d-aed1-e1104a5f93b6";
+    fsType = "ext4";
+    options = ["nofail"];
   };
 
   swapDevices = [
@@ -332,6 +346,7 @@ in {
     nftables.enable = true;
     useNetworkd = true;
     firewall = {
+      trustedInterfaces = ["virbr0"];
       allowedUDPPorts = [51820];
       allowedTCPPorts = [31369];
       checkReversePath = "loose";
@@ -419,6 +434,8 @@ in {
       "wheel"
       "input"
       "uinput"
+      "libvirtd"
+      "kvm"
     ];
     shell = pkgs.fish;
   };
@@ -495,6 +512,12 @@ in {
       nixd
       libguestfs
       qemu-utils
+      pciutils
+      usbutils
+      cryptsetup
+      virtio-win
+      spice-gtk
+      dnsmasq
       gearlever
       protonup-qt
 
@@ -535,6 +558,10 @@ in {
   programs.dconf.profiles.user.databases = [
     {
       settings = {
+        "org/virt-manager/virt-manager/connections" = {
+          autoconnect = ["qemu:///system"];
+          uris = ["qemu:///system"];
+        };
         "org/gnome/desktop/interface" = {
           gtk-theme = "Adwaita";
           color-scheme = "prefer-dark";
@@ -605,6 +632,18 @@ in {
   programs.gamemode.enable = true;
   programs.fish.enable = true;
   programs.direnv.enable = true;
+  programs.virt-manager.enable = true;
+
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu = {
+      package = pkgs.qemu_kvm;
+      runAsRoot = true;
+      swtpm.enable = true;
+    };
+  };
+
+  virtualisation.spiceUSBRedirection.enable = true;
 
   home-manager = {
     extraSpecialArgs = {inherit inputs;};
@@ -653,7 +692,6 @@ in {
 
   services.push2talk = {
     enable = true;
-    device = "/dev/input/by-id/usb-Razer_Razer_Naga_Epic_Chroma-event-mouse";
     keyCode = "BTN_EXTRA";
   };
 
