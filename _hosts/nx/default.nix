@@ -496,6 +496,7 @@ in {
       libguestfs
       qemu-utils
       gearlever
+      protonup-qt
 
       discord
 
@@ -593,7 +594,14 @@ in {
     #   "widget.dmabuf.force-enabled" = true;
     # };
   };
-  programs.steam.enable = true;
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = false;
+    extraCompatPackages = with pkgs; [
+      proton-ge-bin
+    ];
+  };
   programs.gamemode.enable = true;
   programs.fish.enable = true;
   programs.direnv.enable = true;
@@ -628,7 +636,7 @@ in {
     enable = true;
     # GNOME sets up xdg-desktop-portal-gnome automatically,
     # but declaring it ensures the portal listener is active
-    extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
+    extraPortals = [pkgs.xdg-desktop-portal-gnome];
   };
 
   services.xserver = {
